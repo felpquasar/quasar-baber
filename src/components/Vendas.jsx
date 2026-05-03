@@ -9,7 +9,6 @@ import Spinner from './ui/Spinner';
 
 const FORMAS = ["a_vista", "cartao", "pix", "fiado"];
 const FORMA_LABEL = { a_vista: "À Vista", cartao: "Cartão", pix: "Pix", fiado: "Fiado" };
-const FORMA_COR = { a_vista: "#4caf82", cartao: "#6b9fd4", pix: "#5cb8d4", fiado: "#e8a020" };
 const PRAZOS = [{ label: "À Vista", dias: 0 }, { label: "30d", dias: 30 }, { label: "60d", dias: 60 }, { label: "90d", dias: 90 }];
 
 const Vendas = ({ vendas, setVendas, clientes, produtos, setProdutos, setMovimentos, setContasReceber, notify }) => {
@@ -18,6 +17,25 @@ const Vendas = ({ vendas, setVendas, clientes, produtos, setProdutos, setMovimen
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({ clienteId: "", data: today(), status: "pendente", desconto: "", forma: "fiado", prazo: 30 });
   const [itens, setItens] = useState([{ produtoId: "", quantidade: 1, preco: "" }]);
+
+  const [busca, setBusca] = useState("");
+  const [filtroStatus, setFiltroStatus] = useState("todos");
+  const [dataIni, setDataIni] = useState("");
+  const [dataFim, setDataFim] = useState("");
+
+  const lista = useMemo(() => vendas.filter(v => {
+    if (filtroStatus !== "todos" && v.status !== filtroStatus) return false;
+    if (dataIni && v.data < dataIni) return false;
+    if (dataFim && v.data > dataFim) return false;
+    if (busca) {
+      const cli = clientes.find(c => c.id === v.cliente_id);
+      if (!cli?.nome.toLowerCase().includes(busca.toLowerCase())) return false;
+    }
+    return true;
+  }), [vendas, clientes, busca, filtroStatus, dataIni, dataFim]);
+
+  const totalFiltrado = useMemo(() => lista.reduce((a, v) => a + Number(v.total), 0), [lista]);
+  const temFiltro = busca || filtroStatus !== "todos" || dataIni || dataFim;
 
   const addItem = () => setItens(p => [...p, { produtoId: "", quantidade: 1, preco: "" }]);
   const remItem = (i) => setItens(p => p.filter((_, idx) => idx !== i));
@@ -85,12 +103,119 @@ const Vendas = ({ vendas, setVendas, clientes, produtos, setProdutos, setMovimen
     notify("Venda marcada como paga!");
   };
 
+  const exportarPDF = () => {
+    const fmtBRL = n => {
+      const [int, dec] = Number(n).toFixed(2).split(".");
+      return "R$ " + int.replace(/\B(?=(\d{3})+(?!\d))/g, ".") + "," + dec;
+    };
+    const corStatus = { pago: "#16a34a", pendente: "#d97706", cancelado: "#dc2626" };
+    const rows = lista.map(v => {
+      const cli = clientes.find(c => c.id === v.cliente_id);
+      return `<tr>
+        <td>#${String(v.id).slice(-4)}</td>
+        <td>${v.data || "—"}</td>
+        <td>${cli?.nome ?? "—"}</td>
+        <td style="text-align:center">${(v.venda_itens || []).length}</td>
+        <td style="text-align:right">${v.desconto_pct ? `-${v.desconto_pct}%` : "—"}</td>
+        <td style="text-align:right;font-weight:600">${fmtBRL(v.total)}</td>
+        <td style="text-align:center;color:${corStatus[v.status] || "#555"};font-weight:500">${v.status}</td>
+      </tr>`;
+    }).join("");
+
+    const filtros = [
+      busca && `Cliente: "${busca}"`,
+      filtroStatus !== "todos" && `Status: ${filtroStatus}`,
+      dataIni && `De: ${dataIni}`,
+      dataFim && `Até: ${dataFim}`,
+    ].filter(Boolean).join(" · ");
+
+    const html = `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Vendas — Quasar Barber</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:Arial,sans-serif;font-size:12px;color:#222;padding:24px}
+    h1{font-size:20px;font-weight:700;margin-bottom:4px}
+    .sub{font-size:11px;color:#888;margin-bottom:20px}
+    table{width:100%;border-collapse:collapse;margin-bottom:16px}
+    th{background:#f5f5f5;padding:7px 10px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.05em;border-bottom:2px solid #ddd;color:#666}
+    td{padding:6px 10px;border-bottom:1px solid #eee}
+    .total-row{text-align:right;font-size:13px;padding-top:10px;border-top:2px solid #222}
+    @media print{body{padding:0}}
+  </style>
+</head>
+<body>
+  <h1>Vendas — Quasar Barber</h1>
+  <div class="sub">
+    ${new Date().toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" })}
+    · ${lista.length} registro${lista.length !== 1 ? "s" : ""}
+    ${filtros ? ` · Filtros: ${filtros}` : ""}
+  </div>
+  <table>
+    <thead><tr>
+      <th>#</th><th>Data</th><th>Cliente</th>
+      <th style="text-align:center">Itens</th>
+      <th style="text-align:right">Desconto</th>
+      <th style="text-align:right">Total</th>
+      <th style="text-align:center">Status</th>
+    </tr></thead>
+    <tbody>${rows || '<tr><td colspan="7" style="text-align:center;color:#888;padding:20px">Nenhuma venda encontrada</td></tr>'}</tbody>
+  </table>
+  <div class="total-row"><strong>Total: ${fmtBRL(totalFiltrado)}</strong></div>
+</body>
+</html>`;
+
+    const win = window.open("", "_blank");
+    win.document.write(html);
+    win.document.close();
+    win.print();
+  };
+
   return (
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
         <h2 style={{ fontFamily: "'Playfair Display',serif", fontSize: "1.6rem", color: "#e8c97a", margin: 0 }}>Vendas</h2>
-        <button style={btn("primary")} onClick={abrirModal}><Icon name="plus" size={14} /> Nova Venda</button>
+        <div style={{ display: "flex", gap: 8 }}>
+          <button style={btn("ghost")} onClick={exportarPDF}><Icon name="print" size={14} /> Exportar PDF</button>
+          <button style={btn("primary")} onClick={abrirModal}><Icon name="plus" size={14} /> Nova Venda</button>
+        </div>
       </div>
+
+      {/* Filtros */}
+      <div style={{ display: "flex", gap: 8, marginBottom: ".75rem", flexWrap: "wrap", alignItems: "center" }}>
+        <input placeholder="Buscar por cliente..." value={busca} onChange={e => setBusca(e.target.value)}
+          style={{ ...inp, width: 200 }} />
+        <div style={{ display: "flex", gap: 4 }}>
+          {["todos", "pendente", "pago", "cancelado"].map(s => (
+            <button key={s} onClick={() => setFiltroStatus(s)}
+              style={{ padding: "6px 12px", borderRadius: 6, border: "none", cursor: "pointer", fontSize: ".78rem",
+                background: filtroStatus === s ? (s === "pago" ? "#4caf82" : s === "cancelado" ? "#e05a5a" : s === "pendente" ? "#e8a020" : "#c9a84c") : "#1a1a1a",
+                color: filtroStatus === s ? "#0a0a08" : "#888", fontWeight: filtroStatus === s ? 700 : 400 }}>
+              {s === "todos" ? "Todos" : s.charAt(0).toUpperCase() + s.slice(1)}
+            </button>
+          ))}
+        </div>
+        <input type="date" value={dataIni} onChange={e => setDataIni(e.target.value)} style={{ ...inp, width: 130 }} title="Data inicial" />
+        <span style={{ color: "#444", fontSize: ".82rem" }}>–</span>
+        <input type="date" value={dataFim} onChange={e => setDataFim(e.target.value)} style={{ ...inp, width: 130 }} title="Data final" />
+        {temFiltro && (
+          <button onClick={() => { setBusca(""); setFiltroStatus("todos"); setDataIni(""); setDataFim(""); }}
+            style={{ ...btn("ghost"), padding: "6px 10px", fontSize: ".75rem" }}>
+            <Icon name="x" size={13} /> Limpar
+          </button>
+        )}
+      </div>
+
+      {/* Resumo */}
+      <div style={{ fontSize: ".8rem", color: "#555", marginBottom: ".75rem" }}>
+        {lista.length} venda{lista.length !== 1 ? "s" : ""}
+        {temFiltro && " filtradas"}
+        {" · "}
+        <span style={{ color: "#c9a84c", fontFamily: "'DM Mono',monospace" }}>{fmt(totalFiltrado)}</span>
+      </div>
+
       <div style={{ background: "#161616", border: "1px solid #2a2a2a", borderRadius: 10, overflow: "hidden" }}>
         <table style={{ width: "100%", borderCollapse: "collapse", fontSize: ".88rem" }}>
           <thead><tr style={{ background: "#111" }}>
@@ -99,14 +224,15 @@ const Vendas = ({ vendas, setVendas, clientes, produtos, setProdutos, setMovimen
             ))}
           </tr></thead>
           <tbody>
-            {vendas.map(v => { const cli = clientes.find(c => c.id === v.cliente_id); return (
+            {lista.map(v => { const cli = clientes.find(c => c.id === v.cliente_id); return (
               <tr key={v.id} style={{ borderTop: "1px solid #1f1f1f" }}>
                 <td style={{ padding: ".8rem 1rem", color: "#555", fontSize: ".8rem" }}>#{String(v.id).slice(-4)}</td>
                 <td style={{ padding: ".8rem 1rem", color: "#aaa" }}>{v.data}</td>
                 <td style={{ padding: ".8rem 1rem", color: "#e0e0e0", fontWeight: 500 }}>{cli?.nome ?? "—"}</td>
                 <td style={{ padding: ".8rem 1rem", color: "#999" }}>{(v.venda_itens || []).length} item(s)</td>
                 <td style={{ padding: ".8rem 1rem" }}>
-                  {v.desconto_pct ? <span style={{ fontSize: ".78rem", padding: "2px 8px", borderRadius: 20, background: "#1f1a09", color: "#e8a020", fontFamily: "'DM Mono',monospace" }}>-{v.desconto_pct}%</span>
+                  {v.desconto_pct
+                    ? <span style={{ fontSize: ".78rem", padding: "2px 8px", borderRadius: 20, background: "#1f1a09", color: "#e8a020", fontFamily: "'DM Mono',monospace" }}>-{v.desconto_pct}%</span>
                     : <span style={{ color: "#333", fontSize: ".78rem" }}>—</span>}
                 </td>
                 <td style={{ padding: ".8rem 1rem", color: "#c9a84c", fontWeight: 700, fontFamily: "'DM Mono',monospace" }}>{fmt(v.total)}</td>
@@ -125,7 +251,11 @@ const Vendas = ({ vendas, setVendas, clientes, produtos, setProdutos, setMovimen
                 </td>
               </tr>
             ); })}
-            {vendas.length === 0 && <tr><td colSpan={8} style={{ padding: "2rem", textAlign: "center", color: "#444" }}>Nenhuma venda registrada</td></tr>}
+            {lista.length === 0 && (
+              <tr><td colSpan={8} style={{ padding: "2rem", textAlign: "center", color: "#444" }}>
+                {vendas.length === 0 ? "Nenhuma venda registrada" : "Nenhuma venda corresponde ao filtro"}
+              </td></tr>
+            )}
           </tbody>
         </table>
       </div>
@@ -269,7 +399,5 @@ const Vendas = ({ vendas, setVendas, clientes, produtos, setProdutos, setMovimen
     </div>
   );
 };
-
-// ── App Principal ─────────────────────────────────────────────────
 
 export default Vendas;

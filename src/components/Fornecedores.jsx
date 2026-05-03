@@ -23,23 +23,25 @@ const Fornecedores = ({ fornecedores, setFornecedores, contasPagar, notify }) =>
   const salvar = async () => {
     if (!form.nome) { notify("Nome é obrigatório.", "error"); return; }
     setSaving(true);
-    if (editando) {
-      const { data, error } = await supabase.from("fornecedores").update({ nome: form.nome, contato: form.contato, telefone: form.telefone, cidade: form.cidade, obs: form.obs }).eq("id", editando.id).select().single();
-      setSaving(false); if (error) { notify("Erro ao salvar.", "error"); return; }
-      setFornecedores(prev => prev.map(f => f.id === editando.id ? data : f));
-    } else {
-      const { data, error } = await supabase.from("fornecedores").insert({ nome: form.nome, contato: form.contato, telefone: form.telefone, cidade: form.cidade, obs: form.obs }).select().single();
-      setSaving(false); if (error) { notify("Erro ao salvar.", "error"); return; }
-      setFornecedores(prev => [...prev, data].sort((a, b) => a.nome.localeCompare(b.nome)));
-    }
-    setModal(false);
-    notify(editando ? "Fornecedor atualizado!" : "Fornecedor cadastrado!");
+    try {
+      if (editando) {
+        const { data, error } = await supabase.from("fornecedores").update({ nome: form.nome, contato: form.contato, telefone: form.telefone, cidade: form.cidade, obs: form.obs }).eq("id", editando.id).select().single();
+        if (error) { console.error("fornecedores update:", error); notify(`Erro ao salvar: ${error.message}`, "error"); return; }
+        setFornecedores(prev => prev.map(f => f.id === editando.id ? data : f));
+      } else {
+        const { data, error } = await supabase.from("fornecedores").insert({ nome: form.nome, contato: form.contato, telefone: form.telefone, cidade: form.cidade, obs: form.obs }).select().single();
+        if (error) { console.error("fornecedores insert:", error); notify(`Erro ao salvar: ${error.message}`, "error"); return; }
+        setFornecedores(prev => [...prev, data].sort((a, b) => a.nome.localeCompare(b.nome)));
+      }
+      setModal(false);
+      notify(editando ? "Fornecedor atualizado!" : "Fornecedor cadastrado!");
+    } finally { setSaving(false); }
   };
 
   const excluir = async (id) => {
     if (!window.confirm("Excluir este fornecedor?")) return;
     const { error } = await supabase.from("fornecedores").delete().eq("id", id);
-    if (error) { notify("Erro ao excluir.", "error"); return; }
+    if (error) { console.error("fornecedores delete:", error); notify(`Erro ao excluir: ${error.message}`, "error"); return; }
     setFornecedores(prev => prev.filter(f => f.id !== id));
     notify("Fornecedor excluído.");
   };

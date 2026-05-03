@@ -8,6 +8,7 @@ import Estoque from "./components/Estoque";
 import Clientes from "./components/Clientes";
 import Vendas from "./components/Vendas";
 import Financeiro from "./components/Financeiro";
+import Relatorios from "./components/Relatorios";
 import Toast from "./components/ui/Toast";
 import Spinner from "./components/ui/Spinner";
 import Icon from "./components/ui/Icon";
@@ -29,7 +30,7 @@ export default function App() {
   const [session, setSession] = useState(undefined);
   const [aba, setAba] = useState("dashboard");
   const [sidebar, setSidebar] = useState(true);
-  const { produtos, setProdutos, clientes, setClientes, vendas, setVendas, movimentos, setMovimentos, contasReceber, setContasReceber, contasPagar, setContasPagar, fornecedores, setFornecedores, loading, toast, notify, load } = useStore();
+  const { produtos, setProdutos, clientes, setClientes, vendas, setVendas, movimentos, setMovimentos, contasReceber, setContasReceber, contasPagar, setContasPagar, fornecedores, setFornecedores, pedidosCompra, setPedidosCompra, loading, toast, notify, load } = useStore();
 
   const qtdVencidas = contasReceber.filter(cr => cr.status !== "pago" && cr.data_vencimento < today()).length
     + contasPagar.filter(cp => cp.status !== "pago" && cp.data_vencimento < today()).length;
@@ -48,6 +49,7 @@ export default function App() {
     { id: "clientes", label: "Clientes", icon: "users" },
     { id: "vendas", label: "Vendas", icon: "cart" },
     { id: "financeiro", label: "Financeiro", icon: "money", badge: qtdVencidas },
+    { id: "relatorios", label: "Relatórios", icon: "chart" },
   ];
 
   if (session === undefined) return (
@@ -121,10 +123,11 @@ export default function App() {
             ? <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "60vh", gap: 12, color: "#444" }}><Spinner size={24} /><span>Carregando dados...</span></div>
             : <>
               {aba === "dashboard" && <Dashboard produtos={produtos} clientes={clientes} vendas={vendas} movimentos={movimentos} contasReceber={contasReceber} reload={load} />}
-              {aba === "estoque" && <Estoque produtos={produtos} setProdutos={setProdutos} setMovimentos={setMovimentos} notify={notify} />}
-              {aba === "clientes" && <Clientes clientes={clientes} setClientes={setClientes} vendas={vendas} produtos={produtos} notify={notify} />}
+              {aba === "estoque" && <Estoque produtos={produtos} setProdutos={setProdutos} setMovimentos={setMovimentos} fornecedores={fornecedores} setContasPagar={setContasPagar} pedidosCompra={pedidosCompra} setPedidosCompra={setPedidosCompra} notify={notify} />}
+              {aba === "clientes" && <Clientes clientes={clientes} setClientes={setClientes} vendas={vendas} produtos={produtos} contasReceber={contasReceber} notify={notify} />}
               {aba === "vendas" && <Vendas vendas={vendas} setVendas={setVendas} clientes={clientes} produtos={produtos} setProdutos={setProdutos} setMovimentos={setMovimentos} setContasReceber={setContasReceber} notify={notify} />}
               {aba === "financeiro" && <Financeiro contasReceber={contasReceber} setContasReceber={setContasReceber} contasPagar={contasPagar} setContasPagar={setContasPagar} fornecedores={fornecedores} setFornecedores={setFornecedores} clientes={clientes} notify={notify} />}
+              {aba === "relatorios" && <Relatorios vendas={vendas} clientes={clientes} produtos={produtos} contasReceber={contasReceber} contasPagar={contasPagar} />}
             </>
           }
         </main>

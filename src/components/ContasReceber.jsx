@@ -54,41 +54,43 @@ const ContasReceber = ({ contasReceber, setContasReceber, clientes, notify }) =>
   const salvarNova = async () => {
     if (!form.clienteId || !form.valor || !form.vencimento) { notify("Preencha todos os campos obrigatórios.", "error"); return; }
     setSaving(true);
-    const { data, error } = await supabase.from("contas_receber").insert({
-      cliente_id: Number(form.clienteId),
-      descricao: form.descricao,
-      valor: Number(form.valor),
-      forma_pagamento: form.forma,
-      data_emissao: today(),
-      data_vencimento: form.vencimento,
-      status: "pendente",
-      obs: form.obs,
-    }).select().single();
-    setSaving(false);
-    if (error) { notify("Erro ao salvar cobrança.", "error"); return; }
-    setContasReceber(prev => [...prev, data].sort((a, b) => a.data_vencimento.localeCompare(b.data_vencimento)));
-    setModalNova(false);
-    setForm({ clienteId: "", descricao: "", valor: "", forma: "fiado", vencimento: today(), obs: "" });
-    notify("Cobrança lançada!");
+    try {
+      const { data, error } = await supabase.from("contas_receber").insert({
+        cliente_id: Number(form.clienteId),
+        descricao: form.descricao,
+        valor: Number(form.valor),
+        forma_pagamento: form.forma,
+        data_emissao: today(),
+        data_vencimento: form.vencimento,
+        status: "pendente",
+        obs: form.obs,
+      }).select().single();
+      if (error) { console.error("contas_receber insert:", error); notify(`Erro ao salvar cobrança: ${error.message}`, "error"); return; }
+      setContasReceber(prev => [...prev, data].sort((a, b) => a.data_vencimento.localeCompare(b.data_vencimento)));
+      setModalNova(false);
+      setForm({ clienteId: "", descricao: "", valor: "", forma: "fiado", vencimento: today(), obs: "" });
+      notify("Cobrança lançada!");
+    } finally { setSaving(false); }
   };
 
   const confirmarPagamento = async () => {
     if (!modalPagar) return;
     setSaving(true);
-    const { data, error } = await supabase.from("contas_receber")
-      .update({ status: "pago", data_pagamento: pagarForm.data, forma_pagamento: pagarForm.forma })
-      .eq("id", modalPagar.id).select().single();
-    setSaving(false);
-    if (error) { notify("Erro ao registrar pagamento.", "error"); return; }
-    setContasReceber(prev => prev.map(cr => cr.id === modalPagar.id ? data : cr));
-    setModalPagar(null);
-    notify("Pagamento registrado!");
+    try {
+      const { data, error } = await supabase.from("contas_receber")
+        .update({ status: "pago", data_pagamento: pagarForm.data, forma_pagamento: pagarForm.forma })
+        .eq("id", modalPagar.id).select().single();
+      if (error) { console.error("contas_receber update:", error); notify(`Erro ao registrar pagamento: ${error.message}`, "error"); return; }
+      setContasReceber(prev => prev.map(cr => cr.id === modalPagar.id ? data : cr));
+      setModalPagar(null);
+      notify("Pagamento registrado!");
+    } finally { setSaving(false); }
   };
 
   const excluir = async (id) => {
     if (!window.confirm("Excluir esta cobrança?")) return;
     const { error } = await supabase.from("contas_receber").delete().eq("id", id);
-    if (error) { notify("Erro ao excluir.", "error"); return; }
+    if (error) { console.error("contas_receber delete:", error); notify(`Erro ao excluir: ${error.message}`, "error"); return; }
     setContasReceber(prev => prev.filter(cr => cr.id !== id));
     notify("Cobrança removida.");
   };
