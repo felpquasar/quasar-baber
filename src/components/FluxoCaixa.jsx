@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+﻿import { useState, useMemo } from 'react';
 import { fmt, today } from '../lib/utils';
 
 const MESES_LABEL = ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
@@ -88,12 +88,12 @@ const FluxoCaixa = ({ contasReceber, contasPagar, clientes, fornecedores }) => {
   return (
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
-        <h2 style={{ fontFamily: "'Playfair Display',serif", fontSize: "1.6rem", color: "#e8c97a", margin: 0 }}>Fluxo de Caixa</h2>
+        <h2 style={{ fontFamily: "'Playfair Display',serif", fontSize: "1.6rem", color: "#c984ac", margin: 0 }}>Fluxo de Caixa</h2>
         <div style={{ display: "flex", gap: 6 }}>
           {[["3m", "3 Meses"], ["6m", "6 Meses"], ["12m", "12 Meses"]].map(([v, l]) => (
             <button key={v} onClick={() => setPeriodo(v)}
               style={{ padding: "6px 14px", borderRadius: 6, border: "none", cursor: "pointer", fontSize: ".8rem",
-                background: periodo === v ? "#c9a84c" : "#1a1a1a",
+                background: periodo === v ? "#ffbf00" : "#1a1a1a",
                 color: periodo === v ? "#0a0a08" : "#888",
                 fontWeight: periodo === v ? 700 : 400 }}>
               {l}

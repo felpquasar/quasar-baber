@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { useMobile } from '../hooks/useMobile';
 import { supabase } from '../lib/supabase';
 import { fmt, today } from '../lib/utils';
@@ -78,7 +78,7 @@ const Estoque = ({ produtos, setProdutos, setMovimentos, notify, fornecedores, s
       <div style={{ display: "flex", gap: 0, marginBottom: "1.75rem", borderBottom: "1px solid #1f1f1f" }}>
         {TABS.map(t => (
           <button key={t.id} onClick={() => setAbaEstoque(t.id)}
-            style={{ padding: "8px 20px 11px", border: "none", borderBottom: `2px solid ${abaEstoque === t.id ? "#c9a84c" : "transparent"}`, background: "transparent", cursor: "pointer", color: abaEstoque === t.id ? "#e8c97a" : "#555", fontSize: ".92rem", fontWeight: abaEstoque === t.id ? 600 : 400, transition: "all .15s", marginBottom: -1 }}>
+            style={{ padding: "8px 20px 11px", border: "none", borderBottom: `2px solid ${abaEstoque === t.id ? "#ffbf00" : "transparent"}`, background: "transparent", cursor: "pointer", color: abaEstoque === t.id ? "#c984ac" : "#555", fontSize: ".92rem", fontWeight: abaEstoque === t.id ? 600 : 400, transition: "all .15s", marginBottom: -1 }}>
             {t.label}
           </button>
         ))}
@@ -91,7 +91,7 @@ const Estoque = ({ produtos, setProdutos, setMovimentos, notify, fornecedores, s
       {abaEstoque === "produtos" && (
         <div>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: isMobile ? "flex-start" : "center", marginBottom: "1.5rem", flexDirection: isMobile ? "column" : "row", gap: isMobile ? 12 : 0 }}>
-            <h2 style={{ fontFamily: "'Playfair Display',serif", fontSize: "1.6rem", color: "#e8c97a", margin: 0 }}>Produtos</h2>
+            <h2 style={{ fontFamily: "'Playfair Display',serif", fontSize: "1.6rem", color: "#c984ac", margin: 0 }}>Produtos</h2>
             <div style={{ display: "flex", gap: 8 }}>
               <input placeholder="Buscar produto..." value={filtro} onChange={e => setFiltro(e.target.value)} style={{ ...inp, width: isMobile ? "100%" : 200 }} />
               <button style={btn("primary")} onClick={() => setModalProd(true)}><Icon name="plus" size={14} /> Novo Produto</button>
@@ -111,7 +111,7 @@ const Estoque = ({ produtos, setProdutos, setMovimentos, notify, fornecedores, s
                     <td style={{ padding: ".8rem 1rem" }}><span style={{ background: "#1f1f1f", color: "#888", padding: "2px 8px", borderRadius: 20, fontSize: ".75rem" }}>{p.categoria || "—"}</span></td>
                     <td style={{ padding: ".8rem 1rem" }}><span style={{ color: p.estoque < 10 ? "#e05a5a" : "#e0e0e0", fontFamily: "'DM Mono',monospace" }}>{p.estoque} {p.unidade}</span></td>
                     <td style={{ padding: ".8rem 1rem", color: "#aaa", fontFamily: "'DM Mono',monospace" }}>{fmt(p.custo)}</td>
-                    <td style={{ padding: ".8rem 1rem", color: "#c9a84c", fontWeight: 600, fontFamily: "'DM Mono',monospace" }}>{fmt(p.preco)}</td>
+                    <td style={{ padding: ".8rem 1rem", color: "#ffbf00", fontWeight: 600, fontFamily: "'DM Mono',monospace" }}>{fmt(p.preco)}</td>
                     <td style={{ padding: ".8rem 1rem" }}>
                       <div style={{ display: "flex", gap: 6 }}>
                         <button onClick={() => abrirEdicao(p)} style={{ ...btn("ghost"), padding: "5px 10px", fontSize: ".75rem" }}><Icon name="pencil" size={13} /></button>
@@ -145,7 +145,7 @@ const Estoque = ({ produtos, setProdutos, setMovimentos, notify, fornecedores, s
               <div style={{ background: "#111", border: "1px solid #2a2a2a", borderRadius: 8, padding: "12px 16px", marginBottom: "1rem", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <div>
                   <div style={{ fontSize: ".7rem", color: "#555", textTransform: "uppercase", letterSpacing: ".05em", marginBottom: 2 }}>Preço de Venda</div>
-                  <div style={{ fontSize: "1.3rem", fontWeight: 700, color: form.preco ? "#c9a84c" : "#333", fontFamily: "'DM Mono',monospace" }}>
+                  <div style={{ fontSize: "1.3rem", fontWeight: 700, color: form.preco ? "#ffbf00" : "#333", fontFamily: "'DM Mono',monospace" }}>
                     {form.preco ? `R$ ${Number(form.preco).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}` : "—"}
                   </div>
                 </div>
@@ -167,7 +167,7 @@ const Estoque = ({ produtos, setProdutos, setMovimentos, notify, fornecedores, s
             <Modal title={`Movimentar — ${modalMov.nome}`} onClose={() => setModalMov(null)}>
               <div style={{ background: "#111", borderRadius: 8, padding: "1rem", marginBottom: "1rem", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <span style={{ color: "#777", fontSize: ".85rem" }}>Estoque atual</span>
-                <span style={{ color: "#e8c97a", fontWeight: 700, fontSize: "1.1rem" }}>{modalMov.estoque} {modalMov.unidade}</span>
+                <span style={{ color: "#c984ac", fontWeight: 700, fontSize: "1.1rem" }}>{modalMov.estoque} {modalMov.unidade}</span>
               </div>
               <Field label="Tipo">
                 <div style={{ display: "flex", gap: 8 }}>
@@ -195,7 +195,7 @@ const Estoque = ({ produtos, setProdutos, setMovimentos, notify, fornecedores, s
             <Modal title={`Editar — ${modalEdit.nome}`} onClose={() => setModalEdit(null)}>
               <div style={{ background: "#111", borderRadius: 8, padding: "10px 14px", marginBottom: "1rem", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <span style={{ color: "#777", fontSize: ".85rem" }}>Estoque atual</span>
-                <span style={{ color: "#e8c97a", fontWeight: 700 }}>{modalEdit.estoque} {modalEdit.unidade}</span>
+                <span style={{ color: "#c984ac", fontWeight: 700 }}>{modalEdit.estoque} {modalEdit.unidade}</span>
               </div>
               <Field label="Nome do Produto"><input style={inp} value={editForm.nome} onChange={e => setEditForm({ ...editForm, nome: e.target.value })} /></Field>
               <Field label="Categoria"><input style={inp} value={editForm.categoria} onChange={e => setEditForm({ ...editForm, categoria: e.target.value })} /></Field>
@@ -214,7 +214,7 @@ const Estoque = ({ produtos, setProdutos, setMovimentos, notify, fornecedores, s
               <div style={{ background: "#111", border: "1px solid #2a2a2a", borderRadius: 8, padding: "12px 16px", marginBottom: "1rem", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <div>
                   <div style={{ fontSize: ".7rem", color: "#555", textTransform: "uppercase", letterSpacing: ".05em", marginBottom: 2 }}>Preço de Venda</div>
-                  <div style={{ fontSize: "1.3rem", fontWeight: 700, color: editForm.preco ? "#c9a84c" : "#333", fontFamily: "'DM Mono',monospace" }}>
+                  <div style={{ fontSize: "1.3rem", fontWeight: 700, color: editForm.preco ? "#ffbf00" : "#333", fontFamily: "'DM Mono',monospace" }}>
                     {editForm.preco ? `R$ ${Number(editForm.preco).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}` : "—"}
                   </div>
                 </div>

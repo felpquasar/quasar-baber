@@ -1,4 +1,4 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { supabase } from "../lib/supabase";
 import { inp } from "../styles/shared";
 import Icon from "./ui/Icon";
@@ -30,7 +30,7 @@ const Login = ({ onLogin }) => {
           <div style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 80, height: 80, borderRadius: 16, background: "#1a1a10", border: "1px solid #2a2a1a", marginBottom: "1rem" }}>
             <img src={LOGO} alt="logo" style={{ width: 64, height: 64, borderRadius: 10, objectFit: "cover" }} />
           </div>
-          <div style={{ fontFamily: "'Playfair Display',serif", fontSize: "1.8rem", color: "#e8c97a" }}>Quasar Barber</div>
+          <div style={{ fontFamily: "'Playfair Display',serif", fontSize: "1.8rem", color: "#c984ac" }}>Quasar Barber</div>
           <div style={{ fontSize: ".75rem", color: "#444", textTransform: "uppercase", letterSpacing: ".12em", marginTop: 4 }}>Sistema de Gestão</div>
         </div>
         <form onSubmit={handleLogin} style={{ background: "#0f0f0c", border: "1px solid #1f1e18", borderRadius: 12, padding: "2rem" }}>
@@ -60,7 +60,7 @@ const Login = ({ onLogin }) => {
             </div>
           )}
           <button type="submit" disabled={loading}
-            style={{ width: "100%", padding: "11px", borderRadius: 8, border: "none", cursor: loading ? "not-allowed" : "pointer", background: "#c9a84c", color: "#0a0a08", fontWeight: 700, fontSize: ".95rem", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
+            style={{ width: "100%", padding: "11px", borderRadius: 8, border: "none", cursor: loading ? "not-allowed" : "pointer", background: "#ffbf00", color: "#0a0a08", fontWeight: 700, fontSize: ".95rem", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
             {loading ? <><Spinner size={15} color="#0a0a08" /> Entrando...</> : "Entrar"}
           </button>
         </form>

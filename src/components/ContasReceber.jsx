@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+﻿import { useState, useMemo } from 'react';
 import { useMobile } from '../hooks/useMobile';
 import { supabase } from '../lib/supabase';
 import { fmt, today } from '../lib/utils';
@@ -100,7 +100,7 @@ const ContasReceber = ({ contasReceber, setContasReceber, clientes, notify }) =>
   return (
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: isMobile ? "flex-start" : "center", marginBottom: "1.5rem", flexDirection: isMobile ? "column" : "row", gap: isMobile ? 12 : 0 }}>
-        <h2 style={{ fontFamily: "'Playfair Display',serif", fontSize: "1.6rem", color: "#e8c97a", margin: 0 }}>Contas a Receber</h2>
+        <h2 style={{ fontFamily: "'Playfair Display',serif", fontSize: "1.6rem", color: "#c984ac", margin: 0 }}>Contas a Receber</h2>
         <button style={btn("primary")} onClick={() => setModalNova(true)}><Icon name="plus" size={14} /> Nova Cobrança</button>
       </div>
 
@@ -135,7 +135,7 @@ const ContasReceber = ({ contasReceber, setContasReceber, clientes, notify }) =>
           <button key={f} onClick={() => setFiltro(f)}
             style={{ padding: "6px 14px", borderRadius: 6, border: "none", cursor: "pointer", fontSize: ".8rem",
               background: filtro === f
-                ? (f === "vencido" ? "#e05a5a" : f === "pago" ? "#4caf82" : f === "pendente" ? "#e8a020" : "#c9a84c")
+                ? (f === "vencido" ? "#e05a5a" : f === "pago" ? "#4caf82" : f === "pendente" ? "#e8a020" : "#ffbf00")
                 : "#1a1a1a",
               color: filtro === f ? "#0a0a08" : "#888",
               fontWeight: filtro === f ? 700 : 400 }}>
@@ -175,7 +175,7 @@ const ContasReceber = ({ contasReceber, setContasReceber, clientes, notify }) =>
                     {atraso > 0 && <div style={{ fontSize: ".7rem", color: "#e05a5a", marginTop: 2 }}>{atraso} dia{atraso > 1 ? "s" : ""} atraso</div>}
                     {cr._status === "pago" && cr.data_pagamento && <div style={{ fontSize: ".7rem", color: "#4caf82", marginTop: 2 }}>Pago em {cr.data_pagamento}</div>}
                   </td>
-                  <td style={{ padding: ".8rem 1rem", color: "#c9a84c", fontWeight: 700, fontFamily: "'DM Mono',monospace" }}>{fmt(cr.valor)}</td>
+                  <td style={{ padding: ".8rem 1rem", color: "#ffbf00", fontWeight: 700, fontFamily: "'DM Mono',monospace" }}>{fmt(cr.valor)}</td>
                   <td style={{ padding: ".8rem 1rem" }}>
                     <span style={{ fontSize: ".75rem", padding: "3px 10px", borderRadius: 20, background: STATUS_COR[cr._status] + "22", color: STATUS_COR[cr._status] }}>
                       {STATUS_LABEL[cr._status]}
@@ -261,7 +261,7 @@ const ContasReceber = ({ contasReceber, setContasReceber, clientes, notify }) =>
             <div style={{ fontSize: ".72rem", color: "#555", textTransform: "uppercase", letterSpacing: ".05em", marginBottom: 4 }}>Cliente</div>
             <div style={{ fontSize: "1rem", color: "#e0e0e0", fontWeight: 600 }}>{clientes.find(c => c.id === modalPagar.cliente_id)?.nome}</div>
             {modalPagar.descricao && <div style={{ fontSize: ".82rem", color: "#666", marginTop: 3 }}>{modalPagar.descricao}</div>}
-            <div style={{ fontSize: "1.5rem", fontWeight: 700, color: "#c9a84c", fontFamily: "'DM Mono',monospace", marginTop: 8 }}>{fmt(modalPagar.valor)}</div>
+            <div style={{ fontSize: "1.5rem", fontWeight: 700, color: "#ffbf00", fontFamily: "'DM Mono',monospace", marginTop: 8 }}>{fmt(modalPagar.valor)}</div>
           </div>
           <Field label="Forma de Pagamento Recebida">
             <div style={{ display: "flex", gap: 6 }}>

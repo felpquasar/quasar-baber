@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+﻿import { useState, useMemo } from 'react';
 import { fmt } from '../lib/utils';
 import { inp, btn } from '../styles/shared';
 import Icon from './ui/Icon';
@@ -83,7 +83,7 @@ const RelatorioVendas = ({ vendas, clientes }) => {
   return (
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
-        <h2 style={{ fontFamily: "'Playfair Display',serif", fontSize: "1.6rem", color: "#e8c97a", margin: 0 }}>Análise de Vendas</h2>
+        <h2 style={{ fontFamily: "'Playfair Display',serif", fontSize: "1.6rem", color: "#c984ac", margin: 0 }}>Análise de Vendas</h2>
         <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
           <select value={ano} onChange={e => setAno(Number(e.target.value))} style={{ ...inp, width: 90 }}>
             {anos.map(a => <option key={a} value={a}>{a}</option>)}
@@ -98,8 +98,8 @@ const RelatorioVendas = ({ vendas, clientes }) => {
       {/* Cards */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(148px,1fr))", gap: 12, marginBottom: "1.5rem" }}>
         {[
-          { label: "Vendas", valor: resumo.qtd, cor: "#c9a84c", fmt: n => n },
-          { label: "Receita Bruta", valor: resumo.total, cor: "#c9a84c", fmt },
+          { label: "Vendas", valor: resumo.qtd, cor: "#ffbf00", fmt: n => n },
+          { label: "Receita Bruta", valor: resumo.total, cor: "#ffbf00", fmt },
           { label: "Ticket Médio", valor: resumo.ticket, cor: "#6b9fd4", fmt },
           { label: "Recebido", valor: resumo.recebido, cor: "#4caf82", fmt },
           { label: "A Receber", valor: resumo.pendente, cor: "#e8a020", fmt },
@@ -138,11 +138,11 @@ const RelatorioVendas = ({ vendas, clientes }) => {
                       <td style={{ padding: ".65rem 1rem" }}>
                         <div style={{ color: "#e0e0e0", fontWeight: 500, marginBottom: 4 }}>{c.nome}</div>
                         <div style={{ background: "#1a1a1a", borderRadius: 3, height: 3, overflow: "hidden" }}>
-                          <div style={{ width: `${c.pct}%`, height: "100%", background: "#c9a84c55", borderRadius: 3 }} />
+                          <div style={{ width: `${c.pct}%`, height: "100%", background: "#ffbf0055", borderRadius: 3 }} />
                         </div>
                       </td>
                       <td style={{ padding: ".65rem 1rem", textAlign: "right", color: "#888" }}>{c.qtd}</td>
-                      <td style={{ padding: ".65rem 1rem", textAlign: "right", color: "#c9a84c", fontWeight: 700, fontFamily: "'DM Mono',monospace" }}>{fmt(c.total)}</td>
+                      <td style={{ padding: ".65rem 1rem", textAlign: "right", color: "#ffbf00", fontWeight: 700, fontFamily: "'DM Mono',monospace" }}>{fmt(c.total)}</td>
                       <td style={{ padding: ".65rem 1rem", textAlign: "right", color: "#555", fontFamily: "'DM Mono',monospace", fontSize: ".82rem" }}>{c.pct.toFixed(1)}%</td>
                     </tr>
                   ))}

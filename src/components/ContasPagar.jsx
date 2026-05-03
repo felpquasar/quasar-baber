@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+﻿import { useState, useMemo } from 'react';
 import { useMobile } from '../hooks/useMobile';
 import { supabase } from '../lib/supabase';
 import { fmt, today } from '../lib/utils';
@@ -14,7 +14,7 @@ const FORMA_COR = { a_vista: "#4caf82", cartao: "#6b9fd4", pix: "#5cb8d4", trans
 
 const CATEGORIAS = ["estoque", "aluguel", "servicos", "impostos", "outros"];
 const CAT_LABEL = { estoque: "Estoque", aluguel: "Aluguel", servicos: "Serviços", impostos: "Impostos", outros: "Outros" };
-const CAT_COR = { estoque: "#c9a84c", aluguel: "#6b9fd4", servicos: "#5cb8d4", impostos: "#e05a5a", outros: "#888" };
+const CAT_COR = { estoque: "#ffbf00", aluguel: "#6b9fd4", servicos: "#5cb8d4", impostos: "#e05a5a", outros: "#888" };
 
 const STATUS_COR = { pago: "#4caf82", pendente: "#e8a020", vencido: "#e05a5a" };
 const STATUS_LABEL = { pago: "Pago", pendente: "Pendente", vencido: "Vencido" };
@@ -106,7 +106,7 @@ const ContasPagar = ({ contasPagar, setContasPagar, fornecedores, notify }) => {
   return (
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: isMobile ? "flex-start" : "center", marginBottom: "1.5rem", flexDirection: isMobile ? "column" : "row", gap: isMobile ? 12 : 0 }}>
-        <h2 style={{ fontFamily: "'Playfair Display',serif", fontSize: "1.6rem", color: "#e8c97a", margin: 0 }}>Contas a Pagar</h2>
+        <h2 style={{ fontFamily: "'Playfair Display',serif", fontSize: "1.6rem", color: "#c984ac", margin: 0 }}>Contas a Pagar</h2>
         <button style={btn("primary")} onClick={() => setModalNova(true)}><Icon name="plus" size={14} /> Nova Conta</button>
       </div>
 
@@ -138,7 +138,7 @@ const ContasPagar = ({ contasPagar, setContasPagar, fornecedores, notify }) => {
           <button key={f} onClick={() => setFiltro(f)}
             style={{ padding: "6px 14px", borderRadius: 6, border: "none", cursor: "pointer", fontSize: ".8rem",
               background: filtro === f
-                ? (f === "vencido" ? "#e05a5a" : f === "pago" ? "#4caf82" : f === "pendente" ? "#e8a020" : "#c9a84c")
+                ? (f === "vencido" ? "#e05a5a" : f === "pago" ? "#4caf82" : f === "pendente" ? "#e8a020" : "#ffbf00")
                 : "#1a1a1a",
               color: filtro === f ? "#0a0a08" : "#888",
               fontWeight: filtro === f ? 700 : 400 }}>
@@ -177,7 +177,7 @@ const ContasPagar = ({ contasPagar, setContasPagar, fornecedores, notify }) => {
                     {atraso > 0 && <div style={{ fontSize: ".7rem", color: "#e05a5a", marginTop: 2 }}>{atraso} dia{atraso > 1 ? "s" : ""} atraso</div>}
                     {cp._status === "pago" && cp.data_pagamento && <div style={{ fontSize: ".7rem", color: "#4caf82", marginTop: 2 }}>Pago em {cp.data_pagamento}</div>}
                   </td>
-                  <td style={{ padding: ".8rem 1rem", color: "#c9a84c", fontWeight: 700, fontFamily: "'DM Mono',monospace" }}>{fmt(cp.valor)}</td>
+                  <td style={{ padding: ".8rem 1rem", color: "#ffbf00", fontWeight: 700, fontFamily: "'DM Mono',monospace" }}>{fmt(cp.valor)}</td>
                   <td style={{ padding: ".8rem 1rem" }}>
                     <span style={{ fontSize: ".75rem", padding: "3px 10px", borderRadius: 20, background: STATUS_COR[cp._status] + "22", color: STATUS_COR[cp._status] }}>
                       {STATUS_LABEL[cp._status]}
@@ -276,7 +276,7 @@ const ContasPagar = ({ contasPagar, setContasPagar, fornecedores, notify }) => {
             {fornecedores.find(f => f.id === modalPagar.fornecedor_id) && (
               <div style={{ fontSize: ".82rem", color: "#666", marginTop: 3 }}>{fornecedores.find(f => f.id === modalPagar.fornecedor_id).nome}</div>
             )}
-            <div style={{ fontSize: "1.5rem", fontWeight: 700, color: "#c9a84c", fontFamily: "'DM Mono',monospace", marginTop: 8 }}>{fmt(modalPagar.valor)}</div>
+            <div style={{ fontSize: "1.5rem", fontWeight: 700, color: "#ffbf00", fontFamily: "'DM Mono',monospace", marginTop: 8 }}>{fmt(modalPagar.valor)}</div>
           </div>
           <Field label="Forma de Pagamento">
             <div style={{ display: "flex", gap: 6 }}>

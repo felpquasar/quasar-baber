@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+﻿import { useState, useMemo } from 'react';
 import { useMobile } from '../hooks/useMobile';
 import { supabase } from '../lib/supabase';
 import { fmt, today, addDays } from '../lib/utils';
@@ -178,7 +178,7 @@ const Vendas = ({ vendas, setVendas, clientes, produtos, setProdutos, setMovimen
   return (
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: isMobile ? "flex-start" : "center", marginBottom: "1.5rem", flexDirection: isMobile ? "column" : "row", gap: isMobile ? 12 : 0 }}>
-        <h2 style={{ fontFamily: "'Playfair Display',serif", fontSize: "1.6rem", color: "#e8c97a", margin: 0 }}>Vendas</h2>
+        <h2 style={{ fontFamily: "'Playfair Display',serif", fontSize: "1.6rem", color: "#c984ac", margin: 0 }}>Vendas</h2>
         <div style={{ display: "flex", gap: 8 }}>
           <button style={btn("ghost")} onClick={exportarPDF}><Icon name="print" size={14} /> Exportar PDF</button>
           <button style={btn("primary")} onClick={abrirModal}><Icon name="plus" size={14} /> Nova Venda</button>
@@ -193,7 +193,7 @@ const Vendas = ({ vendas, setVendas, clientes, produtos, setProdutos, setMovimen
           {["todos", "pendente", "pago", "cancelado"].map(s => (
             <button key={s} onClick={() => setFiltroStatus(s)}
               style={{ padding: "6px 12px", borderRadius: 6, border: "none", cursor: "pointer", fontSize: ".78rem",
-                background: filtroStatus === s ? (s === "pago" ? "#4caf82" : s === "cancelado" ? "#e05a5a" : s === "pendente" ? "#e8a020" : "#c9a84c") : "#1a1a1a",
+                background: filtroStatus === s ? (s === "pago" ? "#4caf82" : s === "cancelado" ? "#e05a5a" : s === "pendente" ? "#e8a020" : "#ffbf00") : "#1a1a1a",
                 color: filtroStatus === s ? "#0a0a08" : "#888", fontWeight: filtroStatus === s ? 700 : 400 }}>
               {s === "todos" ? "Todos" : s.charAt(0).toUpperCase() + s.slice(1)}
             </button>
@@ -215,7 +215,7 @@ const Vendas = ({ vendas, setVendas, clientes, produtos, setProdutos, setMovimen
         {lista.length} venda{lista.length !== 1 ? "s" : ""}
         {temFiltro && " filtradas"}
         {" · "}
-        <span style={{ color: "#c9a84c", fontFamily: "'DM Mono',monospace" }}>{fmt(totalFiltrado)}</span>
+        <span style={{ color: "#ffbf00", fontFamily: "'DM Mono',monospace" }}>{fmt(totalFiltrado)}</span>
       </div>
 
       <div style={{ background: "#161616", border: "1px solid #2a2a2a", borderRadius: 10, overflow: "auto" }}>
@@ -237,7 +237,7 @@ const Vendas = ({ vendas, setVendas, clientes, produtos, setProdutos, setMovimen
                     ? <span style={{ fontSize: ".78rem", padding: "2px 8px", borderRadius: 20, background: "#1f1a09", color: "#e8a020", fontFamily: "'DM Mono',monospace" }}>-{v.desconto_pct}%</span>
                     : <span style={{ color: "#333", fontSize: ".78rem" }}>—</span>}
                 </td>
-                <td style={{ padding: ".8rem 1rem", color: "#c9a84c", fontWeight: 700, fontFamily: "'DM Mono',monospace" }}>{fmt(v.total)}</td>
+                <td style={{ padding: ".8rem 1rem", color: "#ffbf00", fontWeight: 700, fontFamily: "'DM Mono',monospace" }}>{fmt(v.total)}</td>
                 <td style={{ padding: ".8rem 1rem" }}>
                   <span style={{ fontSize: ".75rem", padding: "3px 10px", borderRadius: 20, background: (statusCor[v.status] || "#555") + "22", color: statusCor[v.status] || "#888" }}>{v.status}</span>
                 </td>
@@ -295,16 +295,16 @@ const Vendas = ({ vendas, setVendas, clientes, produtos, setProdutos, setMovimen
               <div style={{ display: "flex", gap: 8 }}>
                 {PRAZOS.map(p => (
                   <button key={p.dias} onClick={() => setForm({ ...form, prazo: p.dias })}
-                    style={{ flex: 1, padding: "7px 0", borderRadius: 6, border: `1px solid ${form.prazo === p.dias ? "#c9a84c" : "#333"}`, cursor: "pointer",
-                      background: form.prazo === p.dias ? "#c9a84c22" : "transparent",
-                      color: form.prazo === p.dias ? "#c9a84c" : "#666",
+                    style={{ flex: 1, padding: "7px 0", borderRadius: 6, border: `1px solid ${form.prazo === p.dias ? "#ffbf00" : "#333"}`, cursor: "pointer",
+                      background: form.prazo === p.dias ? "#ffbf0022" : "transparent",
+                      color: form.prazo === p.dias ? "#ffbf00" : "#666",
                       fontSize: ".78rem", fontWeight: form.prazo === p.dias ? 700 : 400 }}>
                     {p.label}
                   </button>
                 ))}
               </div>
               <div style={{ marginTop: 6, fontSize: ".75rem", color: "#555" }}>
-                Vencimento: <span style={{ color: "#c9a84c", fontFamily: "'DM Mono',monospace" }}>{addDays(form.data, Number(form.prazo))}</span>
+                Vencimento: <span style={{ color: "#ffbf00", fontFamily: "'DM Mono',monospace" }}>{addDays(form.data, Number(form.prazo))}</span>
               </div>
             </Field>
           )}
@@ -377,7 +377,7 @@ const Vendas = ({ vendas, setVendas, clientes, produtos, setProdutos, setMovimen
               <span style={{ fontSize: ".88rem", color: "#999", fontWeight: 600 }}>Total da Venda</span>
               <div style={{ textAlign: "right" }}>
                 {descPct > 0 && <div style={{ fontSize: ".75rem", color: "#444", textDecoration: "line-through", fontFamily: "'DM Mono',monospace", marginBottom: 2 }}>{fmt(subtotal)}</div>}
-                <span style={{ color: "#c9a84c", fontWeight: 700, fontSize: "1.2rem", fontFamily: "'DM Mono',monospace" }}>{fmt(total)}</span>
+                <span style={{ color: "#ffbf00", fontWeight: 700, fontSize: "1.2rem", fontFamily: "'DM Mono',monospace" }}>{fmt(total)}</span>
               </div>
             </div>
           </div>
@@ -407,7 +407,7 @@ const Vendas = ({ vendas, setVendas, clientes, produtos, setProdutos, setMovimen
               <span style={{ fontSize: ".88rem", color: "#e8a020", fontFamily: "'DM Mono',monospace" }}>− {fmt(detalhe.desconto_valor)}</span>
             </div>
           )}
-          <div style={{ display: "flex", justifyContent: "flex-end", marginTop: ".75rem", fontSize: "1rem", fontWeight: 700, color: "#c9a84c", fontFamily: "'DM Mono',monospace" }}>
+          <div style={{ display: "flex", justifyContent: "flex-end", marginTop: ".75rem", fontSize: "1rem", fontWeight: 700, color: "#ffbf00", fontFamily: "'DM Mono',monospace" }}>
             Total: {fmt(detalhe.total)}
           </div>
         </Modal>

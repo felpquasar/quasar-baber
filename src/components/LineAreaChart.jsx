@@ -1,4 +1,4 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { fmt } from "../lib/utils";
 
 const LineAreaChart = ({ dados }) => {
@@ -49,7 +49,7 @@ const LineAreaChart = ({ dados }) => {
     <div style={{ position: "relative", width: "100%" }}>
       <div style={{ display: "flex", gap: 20, marginBottom: 12 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-          <div style={{ width: 24, height: 2, background: "linear-gradient(90deg,#c9a84c,#e8c97a)", borderRadius: 2 }} />
+          <div style={{ width: 24, height: 2, background: "linear-gradient(90deg,#ffbf00,#c984ac)", borderRadius: 2 }} />
           <span style={{ fontSize: ".72rem", color: "#777", textTransform: "uppercase", letterSpacing: ".05em" }}>Faturamento</span>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
@@ -61,8 +61,8 @@ const LineAreaChart = ({ dados }) => {
         onMouseMove={handleMouseMove} onMouseLeave={handleMouseLeave}>
         <defs>
           <linearGradient id="fatGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#c9a84c" stopOpacity="0.22" />
-            <stop offset="100%" stopColor="#c9a84c" stopOpacity="0.02" />
+            <stop offset="0%" stopColor="#ffbf00" stopOpacity="0.22" />
+            <stop offset="100%" stopColor="#ffbf00" stopOpacity="0.02" />
           </linearGradient>
           <filter id="glow">
             <feGaussianBlur stdDeviation="2.5" result="coloredBlur" />
@@ -95,7 +95,7 @@ const LineAreaChart = ({ dados }) => {
         })}
 
         <path d={fatArea} fill="url(#fatGrad)" />
-        <polyline points={fatPoints} fill="none" stroke="#c9a84c" strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" filter="url(#glow)" />
+        <polyline points={fatPoints} fill="none" stroke="#ffbf00" strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" filter="url(#glow)" />
         <polyline points={qtdPoints} fill="none" stroke="#4caf82" strokeWidth="1.5" strokeLinejoin="round" strokeLinecap="round" strokeDasharray="5 3" opacity="0.75" />
 
         {hoverX !== null && (
@@ -103,7 +103,7 @@ const LineAreaChart = ({ dados }) => {
         )}
         {tooltip !== null && (
           <>
-            <circle cx={xPos(tooltip)} cy={yVal(dados[tooltip].valor)} r="4" fill="#c9a84c" stroke="#1a1a1a" strokeWidth="2" />
+            <circle cx={xPos(tooltip)} cy={yVal(dados[tooltip].valor)} r="4" fill="#ffbf00" stroke="#1a1a1a" strokeWidth="2" />
             <circle cx={xPos(tooltip)} cy={yQtd(dados[tooltip].qtd || 0)} r="3.5" fill="#4caf82" stroke="#1a1a1a" strokeWidth="2" />
           </>
         )}
@@ -122,8 +122,8 @@ const LineAreaChart = ({ dados }) => {
           }}>
             <div style={{ fontSize: ".7rem", color: "#555", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 6 }}>{d.label}</div>
             <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
-              <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#c9a84c", flexShrink: 0 }} />
-              <span style={{ fontSize: ".85rem", color: "#c9a84c", fontFamily: "'DM Mono',monospace", fontWeight: 600 }}>{fmt(d.valor)}</span>
+              <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#ffbf00", flexShrink: 0 }} />
+              <span style={{ fontSize: ".85rem", color: "#ffbf00", fontFamily: "'DM Mono',monospace", fontWeight: 600 }}>{fmt(d.valor)}</span>
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
               <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#4caf82", flexShrink: 0 }} />

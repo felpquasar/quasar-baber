@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { useMobile } from '../hooks/useMobile';
 import { supabase } from '../lib/supabase';
 import { fmt, today } from '../lib/utils';
@@ -51,7 +51,7 @@ const Clientes = ({ clientes, setClientes, vendas, produtos, contasReceber, noti
   const metricas = (cid) => { const vs = vendas.filter(v => v.cliente_id === cid); const t = vs.reduce((a, v) => a + Number(v.total), 0); return { total: t, pedidos: vs.length, ticket: vs.length > 0 ? t / vs.length : 0 }; };
   const vcli = (cid) => vendas.filter(v => v.cliente_id === cid).sort((a, b) => (b.data || "").localeCompare(a.data || ""));
   const statusCor = { pago: "#4caf82", pendente: "#e8a020", cancelado: "#e05a5a" };
-  const cores = { Barbearia: "#c9a84c", Salão: "#b86fcf", Distribuidor: "#6b9fd4", Outros: "#4caf82" };
+  const cores = { Barbearia: "#ffbf00", Salão: "#b86fcf", Distribuidor: "#6b9fd4", Outros: "#4caf82" };
   const lista = clientes.filter(c => c.nome.toLowerCase().includes(filtro.toLowerCase()));
 
   const inadimplente = (cid) => (contasReceber || []).some(cr => cr.cliente_id === cid && cr.status !== "pago" && cr.data_vencimento < today());
@@ -60,7 +60,7 @@ const Clientes = ({ clientes, setClientes, vendas, produtos, contasReceber, noti
   return (
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: isMobile ? "flex-start" : "center", marginBottom: "1.5rem", flexDirection: isMobile ? "column" : "row", gap: isMobile ? 12 : 0 }}>
-        <h2 style={{ fontFamily: "'Playfair Display',serif", fontSize: "1.6rem", color: "#e8c97a", margin: 0 }}>Clientes</h2>
+        <h2 style={{ fontFamily: "'Playfair Display',serif", fontSize: "1.6rem", color: "#c984ac", margin: 0 }}>Clientes</h2>
         <div style={{ display: "flex", gap: 8 }}>
           <input placeholder="Buscar cliente..." value={filtro} onChange={e => setFiltro(e.target.value)} style={{ ...inp, width: isMobile ? "100%" : 200 }} />
           <button style={btn("primary")} onClick={() => abrir()}><Icon name="plus" size={14} /> Novo Cliente</button>
@@ -99,7 +99,7 @@ const Clientes = ({ clientes, setClientes, vendas, produtos, contasReceber, noti
                 <div style={{ display: "flex", gap: 8, marginTop: 10, padding: "8px 10px", background: "#111", borderRadius: 8 }}>
                   <div style={{ flex: 1, textAlign: "center" }}>
                     <div style={{ fontSize: ".7rem", color: "#555" }}>Total</div>
-                    <div style={{ fontSize: ".88rem", fontWeight: 700, color: "#c9a84c", fontFamily: "'DM Mono',monospace" }}>{fmt(m.total)}</div>
+                    <div style={{ fontSize: ".88rem", fontWeight: 700, color: "#ffbf00", fontFamily: "'DM Mono',monospace" }}>{fmt(m.total)}</div>
                   </div>
                   <div style={{ width: 1, background: "#222" }} />
                   <div style={{ flex: 1, textAlign: "center" }}>
@@ -162,7 +162,7 @@ const Clientes = ({ clientes, setClientes, vendas, produtos, contasReceber, noti
               {[{ label: "Total gasto", value: fmt(m.total) }, { label: "Pedidos", value: m.pedidos }, { label: "Ticket médio", value: fmt(m.ticket) }].map((s, i) => (
                 <div key={i} style={{ background: "#111", borderRadius: 8, padding: "10px 14px", textAlign: "center" }}>
                   <div style={{ fontSize: ".7rem", color: "#555", textTransform: "uppercase", letterSpacing: ".05em", marginBottom: 4 }}>{s.label}</div>
-                  <div style={{ fontSize: "1.1rem", fontWeight: 700, color: "#c9a84c", fontFamily: "'DM Mono',monospace" }}>{s.value}</div>
+                  <div style={{ fontSize: "1.1rem", fontWeight: 700, color: "#ffbf00", fontFamily: "'DM Mono',monospace" }}>{s.value}</div>
                 </div>
               ))}
             </div>

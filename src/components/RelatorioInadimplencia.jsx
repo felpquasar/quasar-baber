@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+﻿import { useMemo } from 'react';
 import { fmt, today } from '../lib/utils';
 import { btn } from '../styles/shared';
 import Icon from './ui/Icon';
@@ -49,7 +49,7 @@ const RelatorioInadimplencia = ({ contasReceber, clientes }) => {
   if (vencidas.length === 0) {
     return (
       <div>
-        <h2 style={{ fontFamily: "'Playfair Display',serif", fontSize: "1.6rem", color: "#e8c97a", margin: "0 0 1.5rem" }}>Inadimplência</h2>
+        <h2 style={{ fontFamily: "'Playfair Display',serif", fontSize: "1.6rem", color: "#c984ac", margin: "0 0 1.5rem" }}>Inadimplência</h2>
         <div style={{ background: "#161616", border: "1px solid #2a2a2a", borderRadius: 10, padding: "4rem", textAlign: "center" }}>
           <div style={{ fontSize: "2rem", marginBottom: 10 }}>✓</div>
           <div style={{ color: "#4caf82", fontWeight: 600, fontSize: "1rem", marginBottom: 6 }}>Nenhuma inadimplência</div>
@@ -62,7 +62,7 @@ const RelatorioInadimplencia = ({ contasReceber, clientes }) => {
   return (
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
-        <h2 style={{ fontFamily: "'Playfair Display',serif", fontSize: "1.6rem", color: "#e8c97a", margin: 0 }}>Inadimplência</h2>
+        <h2 style={{ fontFamily: "'Playfair Display',serif", fontSize: "1.6rem", color: "#c984ac", margin: 0 }}>Inadimplência</h2>
         <button style={btn("ghost")} onClick={handleCSV}><Icon name="print" size={14} /> CSV</button>
       </div>
 
@@ -97,7 +97,7 @@ const RelatorioInadimplencia = ({ contasReceber, clientes }) => {
                 ? { label: "Crítico", cor: "#e05a5a" }
                 : c.maxDias > 30
                   ? { label: "Alto", cor: "#e8a020" }
-                  : { label: "Baixo", cor: "#c9a84c" };
+                  : { label: "Baixo", cor: "#ffbf00" };
               return (
                 <tr key={c.id} style={{ borderTop: "1px solid #1f1f1f" }}>
                   <td style={{ padding: ".8rem 1rem", color: "#e0e0e0", fontWeight: 500 }}>{c.nome}</td>

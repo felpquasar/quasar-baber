@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+﻿import { useState, useMemo } from 'react';
 import { useMobile } from '../hooks/useMobile';
 import { supabase } from '../lib/supabase';
 import { fmt, today } from '../lib/utils';
@@ -171,7 +171,7 @@ const Compras = ({ produtos, setProdutos, setMovimentos, fornecedores, setContas
     <div>
       {/* Cabeçalho */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: isMobile ? "flex-start" : "center", marginBottom: "1.5rem", flexWrap: "wrap", gap: 10, flexDirection: isMobile ? "column" : "row" }}>
-        <h2 style={{ fontFamily: "'Playfair Display',serif", fontSize: "1.6rem", color: "#e8c97a", margin: 0 }}>Compras</h2>
+        <h2 style={{ fontFamily: "'Playfair Display',serif", fontSize: "1.6rem", color: "#c984ac", margin: 0 }}>Compras</h2>
         <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
           <div style={{ display: "flex", gap: 4 }}>
             {["todos", "pendente", "recebido", "cancelado"].map(s => (
@@ -201,7 +201,7 @@ const Compras = ({ produtos, setProdutos, setMovimentos, fornecedores, setContas
                 <td style={{ padding: ".8rem 1rem", color: "#e0e0e0" }}>{p.data_pedido}</td>
                 <td style={{ padding: ".8rem 1rem", color: "#aaa" }}>{nomeForn(p.fornecedor_id)}</td>
                 <td style={{ padding: ".8rem 1rem", textAlign: "right", color: "#888" }}>{(p.pedido_itens || []).length}</td>
-                <td style={{ padding: ".8rem 1rem", textAlign: "right", color: "#c9a84c", fontWeight: 700, fontFamily: "'DM Mono',monospace" }}>{fmt(p.total)}</td>
+                <td style={{ padding: ".8rem 1rem", textAlign: "right", color: "#ffbf00", fontWeight: 700, fontFamily: "'DM Mono',monospace" }}>{fmt(p.total)}</td>
                 <td style={{ padding: ".8rem 1rem", color: "#666" }}>
                   {p.status === "recebido" ? (
                     <span style={{ color: "#4caf82", fontSize: ".82rem" }}>Recebido {p.data_recebimento}</span>
@@ -289,7 +289,7 @@ const Compras = ({ produtos, setProdutos, setMovimentos, fornecedores, setContas
                         <td style={{ padding: ".5rem .75rem" }}>
                           <input style={{ ...inp, width: 110, textAlign: "right" }} type="number" step=".01" min="0" placeholder="0,00" value={it.custo_unitario} onChange={e => updateItem(i, "custo_unitario", e.target.value)} />
                         </td>
-                        <td style={{ padding: ".5rem .75rem", textAlign: "right", color: "#c9a84c", fontFamily: "'DM Mono',monospace", fontSize: ".85rem", whiteSpace: "nowrap" }}>
+                        <td style={{ padding: ".5rem .75rem", textAlign: "right", color: "#ffbf00", fontFamily: "'DM Mono',monospace", fontSize: ".85rem", whiteSpace: "nowrap" }}>
                           {sub > 0 ? fmt(sub) : "—"}
                         </td>
                         <td style={{ padding: ".5rem .75rem", textAlign: "right" }}>
@@ -305,7 +305,7 @@ const Compras = ({ produtos, setProdutos, setMovimentos, fornecedores, setContas
             </div>
             <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", gap: "1rem", marginTop: ".75rem", padding: "0 .75rem" }}>
               <span style={{ fontSize: ".8rem", color: "#555" }}>Total do Pedido</span>
-              <span style={{ fontSize: "1.2rem", fontWeight: 700, color: "#e8c97a", fontFamily: "'DM Mono',monospace" }}>{fmt(totalForm)}</span>
+              <span style={{ fontSize: "1.2rem", fontWeight: 700, color: "#c984ac", fontFamily: "'DM Mono',monospace" }}>{fmt(totalForm)}</span>
             </div>
           </div>
 
@@ -328,7 +328,7 @@ const Compras = ({ produtos, setProdutos, setMovimentos, fornecedores, setContas
               { label: "Data Pedido", val: modalVer.data_pedido },
               { label: "Data Prevista", val: modalVer.data_prevista || "—" },
               { label: "Recebimento", val: modalVer.data_recebimento || "—" },
-              { label: "Total", val: <span style={{ color: "#c9a84c", fontFamily: "'DM Mono',monospace", fontWeight: 700 }}>{fmt(modalVer.total)}</span> },
+              { label: "Total", val: <span style={{ color: "#ffbf00", fontFamily: "'DM Mono',monospace", fontWeight: 700 }}>{fmt(modalVer.total)}</span> },
             ].map((s, i) => (
               <div key={i} style={{ background: "#111", borderRadius: 8, padding: ".75rem" }}>
                 <div style={{ fontSize: ".65rem", color: "#555", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 4 }}>{s.label}</div>
@@ -358,14 +358,14 @@ const Compras = ({ produtos, setProdutos, setMovimentos, fornecedores, setContas
                     <td style={{ padding: ".65rem 1rem", color: "#e0e0e0" }}>{nomeProd(it.produto_id)}</td>
                     <td style={{ padding: ".65rem 1rem", color: "#aaa" }}>{it.quantidade}</td>
                     <td style={{ padding: ".65rem 1rem", textAlign: "right", color: "#aaa", fontFamily: "'DM Mono',monospace" }}>{fmt(it.custo_unitario)}</td>
-                    <td style={{ padding: ".65rem 1rem", textAlign: "right", color: "#c9a84c", fontWeight: 700, fontFamily: "'DM Mono',monospace" }}>{fmt(it.quantidade * it.custo_unitario)}</td>
+                    <td style={{ padding: ".65rem 1rem", textAlign: "right", color: "#ffbf00", fontWeight: 700, fontFamily: "'DM Mono',monospace" }}>{fmt(it.quantidade * it.custo_unitario)}</td>
                   </tr>
                 ))}
               </tbody>
               <tfoot>
                 <tr style={{ borderTop: "2px solid #2a2a2a", background: "#111" }}>
                   <td colSpan={3} style={{ padding: ".65rem 1rem", color: "#aaa", fontWeight: 700 }}>Total</td>
-                  <td style={{ padding: ".65rem 1rem", textAlign: "right", color: "#e8c97a", fontWeight: 700, fontFamily: "'DM Mono',monospace" }}>{fmt(modalVer.total)}</td>
+                  <td style={{ padding: ".65rem 1rem", textAlign: "right", color: "#c984ac", fontWeight: 700, fontFamily: "'DM Mono',monospace" }}>{fmt(modalVer.total)}</td>
                 </tr>
               </tfoot>
             </table>
@@ -388,7 +388,7 @@ const Compras = ({ produtos, setProdutos, setMovimentos, fornecedores, setContas
           <div style={{ background: "#111", borderRadius: 8, padding: "1rem", marginBottom: "1.25rem", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <div>
               <div style={{ fontSize: ".7rem", color: "#555", marginBottom: 3 }}>Total do Pedido</div>
-              <div style={{ fontSize: "1.2rem", color: "#e8c97a", fontWeight: 700, fontFamily: "'DM Mono',monospace" }}>{fmt(modalReceber.total)}</div>
+              <div style={{ fontSize: "1.2rem", color: "#c984ac", fontWeight: 700, fontFamily: "'DM Mono',monospace" }}>{fmt(modalReceber.total)}</div>
             </div>
             <div style={{ textAlign: "right" }}>
               <div style={{ fontSize: ".7rem", color: "#555", marginBottom: 3 }}>Fornecedor</div>
@@ -403,7 +403,7 @@ const Compras = ({ produtos, setProdutos, setMovimentos, fornecedores, setContas
           {/* Checkbox gerar conta */}
           <div style={{ display: "flex", alignItems: "center", gap: 10, margin: "1rem 0", padding: ".85rem 1rem", background: "#111", borderRadius: 8, cursor: "pointer" }}
             onClick={() => setReceberForm(f => ({ ...f, gerar_conta: !f.gerar_conta }))}>
-            <div style={{ width: 18, height: 18, borderRadius: 4, border: `2px solid ${receberForm.gerar_conta ? "#c9a84c" : "#333"}`, background: receberForm.gerar_conta ? "#c9a84c" : "transparent", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, transition: "all .15s" }}>
+            <div style={{ width: 18, height: 18, borderRadius: 4, border: `2px solid ${receberForm.gerar_conta ? "#ffbf00" : "#333"}`, background: receberForm.gerar_conta ? "#ffbf00" : "transparent", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, transition: "all .15s" }}>
               {receberForm.gerar_conta && <span style={{ color: "#0a0a08", fontSize: 11, fontWeight: 800, lineHeight: 1 }}>✓</span>}
             </div>
             <div>

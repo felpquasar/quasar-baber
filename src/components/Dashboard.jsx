@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+﻿import { useState, useMemo } from 'react';
 import { fmt, today } from '../lib/utils';
 import Icon from './ui/Icon';
 import LineAreaChart from './LineAreaChart';
@@ -97,10 +97,10 @@ const Dashboard = ({ produtos, clientes, vendas, movimentos, contasReceber, relo
   return (
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem", flexWrap: "wrap", gap: 8 }}>
-        <h2 style={{ fontFamily: "'Playfair Display',serif", fontSize: "1.6rem", color: "#e8c97a", margin: 0 }}>Dashboard</h2>
+        <h2 style={{ fontFamily: "'Playfair Display',serif", fontSize: "1.6rem", color: "#c984ac", margin: 0 }}>Dashboard</h2>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
           {["semana", "mes", "trimestre"].map(p => (
-            <button key={p} onClick={() => setPeriodo(p)} style={{ padding: "6px 14px", borderRadius: 6, border: "none", cursor: "pointer", background: periodo === p ? "#c9a84c" : "#1a1a1a", color: periodo === p ? "#0a0a08" : "#888", fontSize: ".8rem", fontWeight: periodo === p ? 700 : 400 }}>
+            <button key={p} onClick={() => setPeriodo(p)} style={{ padding: "6px 14px", borderRadius: 6, border: "none", cursor: "pointer", background: periodo === p ? "#ffbf00" : "#1a1a1a", color: periodo === p ? "#0a0a08" : "#888", fontSize: ".8rem", fontWeight: periodo === p ? 700 : 400 }}>
               {p === "mes" ? "Mês" : p === "semana" ? "Semana" : "Trimestre"}
             </button>
           ))}
@@ -113,11 +113,11 @@ const Dashboard = ({ produtos, clientes, vendas, movimentos, contasReceber, relo
       {/* Cards */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(180px,1fr))", gap: 12, marginBottom: "1.5rem" }}>
         <div style={{ background: "#161616", border: "1px solid #2a2a2a", borderRadius: 10, padding: "1.25rem" }}>
-          <div style={{ fontSize: "1.6rem", fontWeight: 700, color: "#c9a84c", lineHeight: 1, fontFamily: "'DM Mono',monospace" }}>{fmt(fat)}</div>
+          <div style={{ fontSize: "1.6rem", fontWeight: 700, color: "#ffbf00", lineHeight: 1, fontFamily: "'DM Mono',monospace" }}>{fmt(fat)}</div>
           <div style={{ fontSize: ".75rem", color: "#777", marginTop: 6, textTransform: "uppercase", letterSpacing: ".06em" }}>Faturamento {labelPeriodo}</div>
         </div>
         <div style={{ background: "#161616", border: "1px solid #2a2a2a", borderRadius: 10, padding: "1.25rem" }}>
-          <div style={{ fontSize: "1.6rem", fontWeight: 700, color: "#e8c97a", lineHeight: 1, fontFamily: "'DM Mono',monospace" }}>{fmt(tkt)}</div>
+          <div style={{ fontSize: "1.6rem", fontWeight: 700, color: "#c984ac", lineHeight: 1, fontFamily: "'DM Mono',monospace" }}>{fmt(tkt)}</div>
           <div style={{ fontSize: ".75rem", color: "#777", marginTop: 6, textTransform: "uppercase", letterSpacing: ".06em" }}>Ticket Médio</div>
         </div>
         <div style={{ background: "#161616", border: "1px solid #2a2a2a", borderRadius: 10, padding: "1.25rem" }}>
@@ -167,7 +167,7 @@ const Dashboard = ({ produtos, clientes, vendas, movimentos, contasReceber, relo
             </div>
           </div>
           <div style={{ textAlign: "right" }}>
-            <div style={{ fontSize: ".85rem", color: "#c9a84c", fontFamily: "'DM Mono',monospace", fontWeight: 700 }}>{fmt(fat)}</div>
+            <div style={{ fontSize: ".85rem", color: "#ffbf00", fontFamily: "'DM Mono',monospace", fontWeight: 700 }}>{fmt(fat)}</div>
             <div style={{ fontSize: ".72rem", color: "#555", marginTop: 2 }}>{vp.length} venda{vp.length !== 1 ? "s" : ""} no período</div>
           </div>
         </div>
@@ -184,16 +184,16 @@ const Dashboard = ({ produtos, clientes, vendas, movimentos, contasReceber, relo
             <div key={i} style={{ marginBottom: 10 }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <span style={{ fontSize: 10, fontFamily: "'DM Mono',monospace", color: i === 0 ? "#c9a84c" : "#444", width: 16 }}>#{i + 1}</span>
+                  <span style={{ fontSize: 10, fontFamily: "'DM Mono',monospace", color: i === 0 ? "#ffbf00" : "#444", width: 16 }}>#{i + 1}</span>
                   <span style={{ fontSize: ".85rem", color: "#ccc" }}>{p?.nome ?? `Produto #${tp.id}`}</span>
                 </div>
                 <div style={{ textAlign: "right" }}>
-                  <div style={{ fontSize: ".8rem", color: "#c9a84c", fontFamily: "'DM Mono',monospace" }}>{tp.qty} un</div>
+                  <div style={{ fontSize: ".8rem", color: "#ffbf00", fontFamily: "'DM Mono',monospace" }}>{tp.qty} un</div>
                   <div style={{ fontSize: ".72rem", color: "#444" }}>{fmt(tp.valor)}</div>
                 </div>
               </div>
               <div style={{ background: "#1a1a10", borderRadius: 3, height: 3, overflow: "hidden" }}>
-                <div style={{ height: "100%", width: `${(tp.qty / maxP) * 100}%`, background: "#c9a84c", borderRadius: 3 }} />
+                <div style={{ height: "100%", width: `${(tp.qty / maxP) * 100}%`, background: "#ffbf00", borderRadius: 3 }} />
               </div>
             </div>
           ); })}
@@ -204,12 +204,12 @@ const Dashboard = ({ produtos, clientes, vendas, movimentos, contasReceber, relo
           {topCli.length === 0 && <div style={{ color: "#444", fontSize: ".85rem" }}>Sem dados no período</div>}
           {topCli.map((tc, i) => { const c = clientes.find(x => x.id === tc.id); return (
             <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 10px", borderRadius: 8, background: i === 0 ? "#1a1a10" : "transparent" }}>
-              <div style={{ width: 30, height: 30, borderRadius: "50%", background: i === 0 ? "#c9a84c22" : "#1a1a1a", display: "flex", alignItems: "center", justifyContent: "center", fontSize: ".75rem", color: i === 0 ? "#c9a84c" : "#555", fontFamily: "'DM Mono',monospace", flexShrink: 0 }}>{i + 1}</div>
+              <div style={{ width: 30, height: 30, borderRadius: "50%", background: i === 0 ? "#ffbf0022" : "#1a1a1a", display: "flex", alignItems: "center", justifyContent: "center", fontSize: ".75rem", color: i === 0 ? "#ffbf00" : "#555", fontFamily: "'DM Mono',monospace", flexShrink: 0 }}>{i + 1}</div>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontSize: ".85rem", color: "#ccc", fontWeight: 500, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{c?.nome ?? `Cliente #${tc.id}`}</div>
                 <div style={{ fontSize: ".72rem", color: "#444" }}>{c?.cidade ?? ""} · {tc.pedidos} pedido(s)</div>
               </div>
-              <div style={{ fontSize: ".85rem", color: "#c9a84c", fontFamily: "'DM Mono',monospace", flexShrink: 0 }}>{fmt(tc.total)}</div>
+              <div style={{ fontSize: ".85rem", color: "#ffbf00", fontFamily: "'DM Mono',monospace", flexShrink: 0 }}>{fmt(tc.total)}</div>
             </div>
           ); })}
         </div>
