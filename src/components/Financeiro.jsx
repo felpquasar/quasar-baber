@@ -1,16 +1,21 @@
 ﻿import { useState } from 'react';
-import { today } from '../lib/utils';
+import { fmt, today } from '../lib/utils';
 import ContasReceber from './ContasReceber';
 import ContasPagar from './ContasPagar';
 import Fornecedores from './Fornecedores';
 import FluxoCaixa from './FluxoCaixa';
 import Despesas from './Despesas';
 
-const Financeiro = ({ contasReceber, setContasReceber, contasPagar, setContasPagar, fornecedores, setFornecedores, clientes, despesas, setDespesas, notify }) => {
+const Financeiro = ({ contasReceber, setContasReceber, contasPagar, setContasPagar, fornecedores, setFornecedores, clientes, vendas, despesas, setDespesas, notify }) => {
   const [aba, setAba] = useState("receber");
 
   const qtdReceberVencidas = contasReceber.filter(cr => cr.status !== "pago" && cr.data_vencimento < today()).length;
   const qtdPagarVencidas = contasPagar.filter(cp => cp.status !== "pago" && cp.data_vencimento < today()).length;
+
+  const totalVendas = (vendas || []).filter(v => v.status !== "cancelado").reduce((a, v) => a + Number(v.total), 0);
+  const totalFornecedores = contasPagar.filter(cp => cp.status === "pago").reduce((a, c) => a + Number(c.valor), 0);
+  const totalDespesas = (despesas || []).reduce((a, d) => a + Number(d.valor), 0);
+  const saldoCaixa = totalVendas - totalFornecedores - totalDespesas;
 
   const tabs = [
     { id: "receber", label: "A Receber", badge: qtdReceberVencidas },
@@ -22,6 +27,18 @@ const Financeiro = ({ contasReceber, setContasReceber, contasPagar, setContasPag
 
   return (
     <div>
+      <div style={{ background: saldoCaixa >= 0 ? "#0d1f14" : "#1f0d0d", border: `1px solid ${saldoCaixa >= 0 ? "#1e4a2a" : "#5a1a1a"}`, borderRadius: 10, padding: "1rem 1.5rem", marginBottom: "1.25rem", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 8 }}>
+        <div>
+          <div style={{ fontSize: ".7rem", color: "#555", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 4 }}>Saldo no Caixa</div>
+          <div style={{ fontSize: "1.75rem", fontWeight: 700, color: saldoCaixa >= 0 ? "#4caf82" : "#e05a5a", fontFamily: "'DM Mono',monospace", lineHeight: 1 }}>{fmt(saldoCaixa)}</div>
+        </div>
+        <div style={{ fontSize: ".75rem", color: "#444", textAlign: "right", lineHeight: 1.7 }}>
+          <div>Vendas: <span style={{ color: "#4caf82", fontFamily: "'DM Mono',monospace" }}>{fmt(totalVendas)}</span></div>
+          <div>Fornecedores: <span style={{ color: "#e05a5a", fontFamily: "'DM Mono',monospace" }}>−{fmt(totalFornecedores)}</span></div>
+          <div>Despesas: <span style={{ color: "#e05a5a", fontFamily: "'DM Mono',monospace" }}>−{fmt(totalDespesas)}</span></div>
+        </div>
+      </div>
+
       <div style={{ display: "flex", gap: 0, marginBottom: "1.75rem", borderBottom: "1px solid #1f1f1f", overflowX: "auto" }}>
         {tabs.map(t => (
           <button key={t.id} onClick={() => setAba(t.id)}

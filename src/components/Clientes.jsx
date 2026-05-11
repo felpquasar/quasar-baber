@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+import { useState } from 'react';
 import { useMobile } from '../hooks/useMobile';
 import { supabase } from '../lib/supabase';
 import { fmt, today } from '../lib/utils';
@@ -8,6 +8,13 @@ import Modal from './ui/Modal';
 import Field from './ui/Field';
 import Spinner from './ui/Spinner';
 
+const calcTier = (n) => {
+  if (n >= 4) return { nome: "Elite", pct: 20, cor: "#c9a84c" };
+  if (n >= 3) return { nome: "Ouro", cor: "#c9a84c", pct: 15 };
+  if (n >= 1) return { nome: "Bronze", cor: "#cd7f32", pct: 5 };
+  return null;
+};
+
 const Clientes = ({ clientes, setClientes, vendas, produtos, contasReceber, notify }) => {
   const isMobile = useMobile();
   const [modal, setModal] = useState(false);
@@ -16,19 +23,23 @@ const Clientes = ({ clientes, setClientes, vendas, produtos, contasReceber, noti
   const [filtro, setFiltro] = useState("");
   const [historico, setHistorico] = useState(null);
   const [detalheVenda, setDetalheVenda] = useState(null);
-  const [form, setForm] = useState({ nome: "", contato: "", telefone: "", cidade: "", tipo: "Barbearia", limite_credito: "" });
+  const [form, setForm] = useState({ nome: "", contato: "", telefone: "", cidade: "", tipo: "Barbearia", limite_credito: "", indicado_por: "" });
 
   const abrir = (c = null) => {
     setEditando(c);
     setForm(c
-      ? { nome: c.nome, contato: c.contato || "", telefone: c.telefone || "", cidade: c.cidade || "", tipo: c.tipo || "Barbearia", limite_credito: c.limite_credito || "" }
-      : { nome: "", contato: "", telefone: "", cidade: "", tipo: "Barbearia", limite_credito: "" });
+      ? { nome: c.nome, contato: c.contato || "", telefone: c.telefone || "", cidade: c.cidade || "", tipo: c.tipo || "Barbearia", limite_credito: c.limite_credito || "", indicado_por: c.indicado_por || "" }
+      : { nome: "", contato: "", telefone: "", cidade: "", tipo: "Barbearia", limite_credito: "", indicado_por: "" });
     setModal(true);
   };
 
   const salvar = async () => {
     if (!form.nome) return; setSaving(true);
-    const payload = { nome: form.nome, contato: form.contato, telefone: form.telefone, cidade: form.cidade, tipo: form.tipo, limite_credito: Number(form.limite_credito) || 0 };
+    const payload = {
+      nome: form.nome, contato: form.contato, telefone: form.telefone,
+      cidade: form.cidade, tipo: form.tipo, limite_credito: Number(form.limite_credito) || 0,
+      indicado_por: form.indicado_por ? Number(form.indicado_por) : null,
+    };
     if (editando) {
       const { data, error } = await supabase.from("clientes").update(payload).eq("id", editando.id).select().single();
       setSaving(false); if (error) { notify("Erro ao salvar", "error"); return; }
@@ -37,8 +48,30 @@ const Clientes = ({ clientes, setClientes, vendas, produtos, contasReceber, noti
       const { data, error } = await supabase.from("clientes").insert(payload).select().single();
       setSaving(false); if (error) { notify("Erro ao salvar", "error"); return; }
       setClientes(prev => [...prev, data].sort((a, b) => a.nome.localeCompare(b.nome)));
+
+      if (form.indicado_por) {
+        const refId = Number(form.indicado_por);
+        const referrer = clientes.find(c => c.id === refId);
+        if (referrer) {
+          const novasIndicacoes = (Number(referrer.indicacoes_ativas) || 0) + 1;
+          const tier = calcTier(novasIndicacoes);
+          const novoDesconto = tier ? tier.pct : 0;
+          const { error: eRef } = await supabase.from("clientes")
+            .update({ indicacoes_ativas: novasIndicacoes, desconto_pendente: novoDesconto })
+            .eq("id", refId);
+          if (!eRef) setClientes(prev => prev.map(c => c.id === refId ? { ...c, indicacoes_ativas: novasIndicacoes, desconto_pendente: novoDesconto } : c));
+        }
+      }
     }
     setModal(false); notify(editando ? "Cliente atualizado!" : "Cliente cadastrado!");
+  };
+
+  const usarDesconto = async (c) => {
+    if (!window.confirm(`Aplicar ${c.desconto_pendente}% de desconto para ${c.nome}? Isso zerará o contador de indicações.`)) return;
+    const { error } = await supabase.from("clientes").update({ indicacoes_ativas: 0, desconto_pendente: 0 }).eq("id", c.id);
+    if (error) { notify("Erro ao aplicar desconto", "error"); return; }
+    setClientes(prev => prev.map(x => x.id === c.id ? { ...x, indicacoes_ativas: 0, desconto_pendente: 0 } : x));
+    notify(`Desconto de ${c.desconto_pendente}% aplicado e zerado!`);
   };
 
   const excluir = async (id) => {
@@ -75,6 +108,8 @@ const Clientes = ({ clientes, setClientes, vendas, produtos, contasReceber, noti
           const limCred = Number(c.limite_credito) || 0;
           const pctCred = limCred > 0 ? Math.min(pendente / limCred * 100, 100) : 0;
           const corCred = pctCred >= 90 ? "#e05a5a" : pctCred >= 70 ? "#e8a020" : "#4caf82";
+          const tier = calcTier(Number(c.indicacoes_ativas) || 0);
+          const indicador = c.indicado_por ? clientes.find(x => x.id === c.indicado_por) : null;
           return (
             <div key={c.id} style={{ background: "#161616", border: `1px solid ${inadim ? "#5a1a1a" : "#2a2a2a"}`, borderRadius: 10, padding: "1.25rem" }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: ".75rem" }}>
@@ -86,7 +121,15 @@ const Clientes = ({ clientes, setClientes, vendas, produtos, contasReceber, noti
                         Inadimplente
                       </span>
                     )}
+                    {tier && (
+                      <span style={{ fontSize: ".65rem", padding: "2px 7px", borderRadius: 20, background: tier.cor + "22", color: tier.cor, fontWeight: 700, whiteSpace: "nowrap" }}>
+                        {tier.nome}
+                      </span>
+                    )}
                   </div>
+                  {indicador && (
+                    <div style={{ fontSize: ".72rem", color: "#555", marginTop: 2 }}>Indicado por {indicador.nome}</div>
+                  )}
                 </div>
                 <span style={{ fontSize: ".7rem", padding: "2px 8px", borderRadius: 20, background: (cores[c.tipo] || "#4caf82") + "22", color: cores[c.tipo] || "#4caf82", flexShrink: 0 }}>{c.tipo}</span>
               </div>
@@ -95,6 +138,22 @@ const Clientes = ({ clientes, setClientes, vendas, produtos, contasReceber, noti
                 {c.telefone && <div>📞 {c.telefone}</div>}
                 {c.cidade && <div>📍 {c.cidade}</div>}
               </div>
+
+              {(Number(c.indicacoes_ativas) > 0 || Number(c.desconto_pendente) > 0) && (
+                <div style={{ marginTop: 10, padding: "8px 10px", background: "#111", borderRadius: 8, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <div>
+                    <div style={{ fontSize: ".7rem", color: "#555", marginBottom: 2 }}>Indicações ativas</div>
+                    <div style={{ fontSize: ".88rem", fontWeight: 700, color: "#e0e0e0" }}>{Number(c.indicacoes_ativas) || 0} indicação(ões)</div>
+                  </div>
+                  {Number(c.desconto_pendente) > 0 && (
+                    <div style={{ textAlign: "right" }}>
+                      <div style={{ fontSize: ".7rem", color: "#555", marginBottom: 2 }}>Desconto disponível</div>
+                      <div style={{ fontSize: "1rem", fontWeight: 700, color: "#4caf82", fontFamily: "'DM Mono',monospace" }}>{c.desconto_pendente}%</div>
+                    </div>
+                  )}
+                </div>
+              )}
+
               {m.pedidos > 0 && (
                 <div style={{ display: "flex", gap: 8, marginTop: 10, padding: "8px 10px", background: "#111", borderRadius: 8 }}>
                   <div style={{ flex: 1, textAlign: "center" }}>
@@ -119,9 +178,14 @@ const Clientes = ({ clientes, setClientes, vendas, produtos, contasReceber, noti
                   </div>
                 </div>
               )}
-              <div style={{ display: "flex", gap: 6, marginTop: 12 }}>
+              <div style={{ display: "flex", gap: 6, marginTop: 12, flexWrap: "wrap" }}>
                 <button style={{ ...btn("ghost"), padding: "5px 10px", fontSize: ".75rem" }} onClick={() => abrir(c)}><Icon name="pencil" size={12} /> Editar</button>
                 <button style={{ ...btn("ghost"), padding: "5px 10px", fontSize: ".75rem" }} onClick={() => setHistorico(c)}><Icon name="history" size={12} /> Histórico</button>
+                {Number(c.desconto_pendente) > 0 && (
+                  <button style={{ ...btn("primary"), padding: "5px 10px", fontSize: ".75rem" }} onClick={() => usarDesconto(c)}>
+                    Usar {c.desconto_pendente}%
+                  </button>
+                )}
                 <button style={{ ...btn("danger"), padding: "5px 10px", fontSize: ".75rem" }} onClick={() => excluir(c.id)}><Icon name="trash" size={12} /></button>
               </div>
             </div>
@@ -148,6 +212,14 @@ const Clientes = ({ clientes, setClientes, vendas, produtos, contasReceber, noti
               <input style={inp} type="number" step=".01" min="0" placeholder="0,00" value={form.limite_credito} onChange={e => setForm({ ...form, limite_credito: e.target.value })} />
             </Field>
           </div>
+          <Field label="Indicado por (opcional)">
+            <select style={inp} value={form.indicado_por} onChange={e => setForm({ ...form, indicado_por: e.target.value })}>
+              <option value="">— Nenhum —</option>
+              {clientes
+                .filter(c => !editando || c.id !== editando.id)
+                .map(c => <option key={c.id} value={c.id}>{c.nome}</option>)}
+            </select>
+          </Field>
           <div style={{ display: "flex", gap: 8, justifyContent: "flex-end", marginTop: 8 }}>
             <button style={btn("ghost")} onClick={() => setModal(false)}>Cancelar</button>
             <button style={btn("primary")} onClick={salvar} disabled={saving}>{saving ? <><Spinner size={14} color="#0a0a08" /> Salvando...</> : "Salvar"}</button>

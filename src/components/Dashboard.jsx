@@ -3,7 +3,7 @@ import { fmt, today } from '../lib/utils';
 import Icon from './ui/Icon';
 import LineAreaChart from './LineAreaChart';
 
-const Dashboard = ({ produtos, clientes, vendas, movimentos, contasReceber, despesas, reload }) => {
+const Dashboard = ({ produtos, clientes, vendas, movimentos, contasReceber, contasPagar, despesas, reload }) => {
   const [periodo, setPeriodo] = useState("mes");
   const agora = new Date();
   const mesAtual = agora.toISOString().slice(0, 7);
@@ -46,6 +46,13 @@ const Dashboard = ({ produtos, clientes, vendas, movimentos, contasReceber, desp
 
   const dp = (despesas || []).filter(fp);
   const totalDespesas = dp.reduce((a, d) => a + Number(d.valor), 0);
+
+  const saldoCaixa = useMemo(() => {
+    const entradas = vendas.filter(v => v.status !== "cancelado").reduce((a, v) => a + Number(v.total), 0);
+    const saidasCP = (contasPagar || []).filter(cp => cp.status === "pago").reduce((a, c) => a + Number(c.valor), 0);
+    const saidasDesp = (despesas || []).reduce((a, d) => a + Number(d.valor), 0);
+    return entradas - saidasCP - saidasDesp;
+  }, [vendas, contasPagar, despesas]);
 
   const topProd = useMemo(() => {
     const m = {};
@@ -110,6 +117,19 @@ const Dashboard = ({ produtos, clientes, vendas, movimentos, contasReceber, desp
           <button onClick={reload} style={{ padding: "6px 12px", borderRadius: 6, border: "1px solid #2a2a2a", background: "none", color: "#666", cursor: "pointer", display: "flex", alignItems: "center", gap: 6, fontSize: ".8rem" }}>
             <Icon name="refresh" size={14} /> Atualizar
           </button>
+        </div>
+      </div>
+
+      {/* Saldo */}
+      <div style={{ background: saldoCaixa >= 0 ? "#0d1f14" : "#1f0d0d", border: `1px solid ${saldoCaixa >= 0 ? "#1e4a2a" : "#5a1a1a"}`, borderRadius: 10, padding: "1.25rem 1.5rem", marginBottom: "1rem", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 8 }}>
+        <div>
+          <div style={{ fontSize: ".72rem", color: "#555", textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 4 }}>Saldo no Caixa</div>
+          <div style={{ fontSize: "2rem", fontWeight: 700, color: saldoCaixa >= 0 ? "#4caf82" : "#e05a5a", fontFamily: "'DM Mono',monospace", lineHeight: 1 }}>{fmt(saldoCaixa)}</div>
+        </div>
+        <div style={{ fontSize: ".75rem", color: "#444", textAlign: "right", lineHeight: 1.7 }}>
+          <div>Vendas: <span style={{ color: "#4caf82", fontFamily: "'DM Mono',monospace" }}>{fmt(vendas.filter(v => v.status !== "cancelado").reduce((a, v) => a + Number(v.total), 0))}</span></div>
+          <div>Fornecedores: <span style={{ color: "#e05a5a", fontFamily: "'DM Mono',monospace" }}>−{fmt((contasPagar || []).filter(cp => cp.status === "pago").reduce((a, c) => a + Number(c.valor), 0))}</span></div>
+          <div>Despesas: <span style={{ color: "#e05a5a", fontFamily: "'DM Mono',monospace" }}>−{fmt((despesas || []).reduce((a, d) => a + Number(d.valor), 0))}</span></div>
         </div>
       </div>
 
