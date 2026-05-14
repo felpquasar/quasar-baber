@@ -28,6 +28,13 @@ const Vendas = ({ vendas, setVendas, clientes, produtos, setProdutos, setMovimen
   const [filtroStatus, setFiltroStatus] = useState("todos");
   const [dataIni, setDataIni] = useState("");
   const [dataFim, setDataFim] = useState("");
+  const [ordenarPor, setOrdenarPor] = useState("data");
+  const [ordenarDir, setOrdenarDir] = useState("desc");
+
+  const toggleOrdem = (col) => {
+    if (ordenarPor === col) setOrdenarDir(d => d === "asc" ? "desc" : "asc");
+    else { setOrdenarPor(col); setOrdenarDir("asc"); }
+  };
 
   const lista = useMemo(() => vendas.filter(v => {
     if (filtroStatus !== "todos" && v.status !== filtroStatus) return false;
@@ -38,7 +45,16 @@ const Vendas = ({ vendas, setVendas, clientes, produtos, setProdutos, setMovimen
       if (!cli?.nome.toLowerCase().includes(busca.toLowerCase())) return false;
     }
     return true;
-  }), [vendas, clientes, busca, filtroStatus, dataIni, dataFim]);
+  }).sort((a, b) => {
+    let va, vb;
+    if (ordenarPor === "data") { va = a.data; vb = b.data; }
+    else if (ordenarPor === "cliente") { va = (clientes.find(c => c.id === a.cliente_id)?.nome || "").toLowerCase(); vb = (clientes.find(c => c.id === b.cliente_id)?.nome || "").toLowerCase(); }
+    else if (ordenarPor === "total") { va = Number(a.total); vb = Number(b.total); }
+    else if (ordenarPor === "status") { va = a.status; vb = b.status; }
+    if (va < vb) return ordenarDir === "asc" ? -1 : 1;
+    if (va > vb) return ordenarDir === "asc" ? 1 : -1;
+    return 0;
+  }), [vendas, clientes, busca, filtroStatus, dataIni, dataFim, ordenarPor, ordenarDir]);
 
   const totalFiltrado = useMemo(() => lista.reduce((a, v) => a + Number(v.total), 0), [lista]);
   const temFiltro = busca || filtroStatus !== "todos" || dataIni || dataFim;
@@ -337,8 +353,20 @@ const Vendas = ({ vendas, setVendas, clientes, produtos, setProdutos, setMovimen
       <div style={{ background: "#161616", border: "1px solid #2a2a2a", borderRadius: 10, overflow: "auto" }}>
         <table style={{ width: "100%", borderCollapse: "collapse", fontSize: ".88rem", minWidth: 600 }}>
           <thead><tr style={{ background: "#111" }}>
-            {["#", "Data", "Cliente", "Itens", "Desconto", "Total", "Status", "Ações"].map(h => (
-              <th key={h} style={{ padding: ".75rem 1rem", textAlign: "left", fontSize: ".72rem", color: "#555", textTransform: "uppercase", letterSpacing: ".05em", fontWeight: 600 }}>{h}</th>
+            {[
+              { label: "#", col: null },
+              { label: "Data", col: "data" },
+              { label: "Cliente", col: "cliente" },
+              { label: "Itens", col: null },
+              { label: "Desconto", col: null },
+              { label: "Total", col: "total" },
+              { label: "Status", col: "status" },
+              { label: "Ações", col: null },
+            ].map(({ label, col }) => (
+              <th key={label} onClick={col ? () => toggleOrdem(col) : undefined}
+                style={{ padding: ".75rem 1rem", textAlign: "left", fontSize: ".72rem", color: col ? (ordenarPor === col ? "#c9a84c" : "#555") : "#555", textTransform: "uppercase", letterSpacing: ".05em", fontWeight: 600, cursor: col ? "pointer" : "default", userSelect: "none", whiteSpace: "nowrap" }}>
+                {label}{col && ordenarPor === col ? (ordenarDir === "asc" ? " ↑" : " ↓") : ""}
+              </th>
             ))}
           </tr></thead>
           <tbody>

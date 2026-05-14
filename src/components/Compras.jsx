@@ -24,16 +24,34 @@ const Compras = ({ produtos, setProdutos, setMovimentos, fornecedores, setContas
   const [form, setForm] = useState({ fornecedor_id: "", data_pedido: today(), data_prevista: "", obs: "", itens: [{ ...ITEM_VAZIO }] });
   const [receberForm, setReceberForm] = useState({ data_recebimento: today(), gerar_conta: false, forma_pagamento: "a_vista", data_vencimento: today() });
 
-  const lista = useMemo(() =>
-    filtroStatus === "todos" ? pedidosCompra : pedidosCompra.filter(p => p.status === filtroStatus)
-  , [pedidosCompra, filtroStatus]);
+  const [ordenarPor, setOrdenarPor] = useState("data_pedido");
+  const [ordenarDir, setOrdenarDir] = useState("desc");
+
+  const toggleOrdem = (col) => {
+    if (ordenarPor === col) setOrdenarDir(d => d === "asc" ? "desc" : "asc");
+    else { setOrdenarPor(col); setOrdenarDir("asc"); }
+  };
+
+  const nomeForn = id => fornecedores.find(f => f.id === id)?.nome ?? "—";
+  const nomeProd = id => produtos.find(p => p.id === id)?.nome ?? "—";
+
+  const lista = useMemo(() => {
+    const base = filtroStatus === "todos" ? pedidosCompra : pedidosCompra.filter(p => p.status === filtroStatus);
+    return [...base].sort((a, b) => {
+      let va, vb;
+      if (ordenarPor === "data_pedido") { va = a.data_pedido; vb = b.data_pedido; }
+      else if (ordenarPor === "fornecedor") { va = nomeForn(a.fornecedor_id).toLowerCase(); vb = nomeForn(b.fornecedor_id).toLowerCase(); }
+      else if (ordenarPor === "total") { va = Number(a.total); vb = Number(b.total); }
+      else if (ordenarPor === "status") { va = a.status; vb = b.status; }
+      if (va < vb) return ordenarDir === "asc" ? -1 : 1;
+      if (va > vb) return ordenarDir === "asc" ? 1 : -1;
+      return 0;
+    });
+  }, [pedidosCompra, filtroStatus, fornecedores, ordenarPor, ordenarDir]);
 
   const totalForm = useMemo(() =>
     form.itens.reduce((s, it) => s + (Number(it.quantidade) || 0) * (Number(it.custo_unitario) || 0), 0)
   , [form.itens]);
-
-  const nomeForn = id => fornecedores.find(f => f.id === id)?.nome ?? "—";
-  const nomeProd = id => produtos.find(p => p.id === id)?.nome ?? "—";
 
   const abrirNovo = () => {
     setForm({ fornecedor_id: "", data_pedido: today(), data_prevista: "", obs: "", itens: [{ ...ITEM_VAZIO }] });
@@ -190,8 +208,19 @@ const Compras = ({ produtos, setProdutos, setMovimentos, fornecedores, setContas
         <table style={{ width: "100%", borderCollapse: "collapse", fontSize: ".88rem", minWidth: 560 }}>
           <thead>
             <tr style={{ background: "#111" }}>
-              {["Data", "Fornecedor", "Itens", "Total", "Data Prevista", "Status", "Ações"].map((h, i) => (
-                <th key={h} style={{ padding: ".75rem 1rem", textAlign: i === 2 || i === 3 ? "right" : i === 5 ? "center" : "left", fontSize: ".72rem", color: "#555", textTransform: "uppercase", letterSpacing: ".05em", fontWeight: 600 }}>{h}</th>
+              {[
+                { label: "Data", col: "data_pedido" },
+                { label: "Fornecedor", col: "fornecedor" },
+                { label: "Itens", col: null, align: "right" },
+                { label: "Total", col: "total", align: "right" },
+                { label: "Data Prevista", col: null },
+                { label: "Status", col: "status", align: "center" },
+                { label: "Ações", col: null },
+              ].map(({ label, col, align }) => (
+                <th key={label} onClick={col ? () => toggleOrdem(col) : undefined}
+                  style={{ padding: ".75rem 1rem", textAlign: align || "left", fontSize: ".72rem", color: col ? (ordenarPor === col ? "#c9a84c" : "#555") : "#555", textTransform: "uppercase", letterSpacing: ".05em", fontWeight: 600, cursor: col ? "pointer" : "default", userSelect: "none", whiteSpace: "nowrap" }}>
+                  {label}{col && ordenarPor === col ? (ordenarDir === "asc" ? " ↑" : " ↓") : ""}
+                </th>
               ))}
             </tr>
           </thead>

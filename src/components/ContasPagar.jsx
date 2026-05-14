@@ -38,17 +38,35 @@ const ContasPagar = ({ contasPagar, setContasPagar, fornecedores, notify }) => {
   const [form, setForm] = useState({ fornecedorId: "", descricao: "", categoria: "outros", valor: "", forma: "a_vista", vencimento: today(), obs: "" });
   const [pagarForm, setPagarForm] = useState({ forma: "a_vista", data: today() });
   const [editForm, setEditForm] = useState({});
+  const [ordenarPor, setOrdenarPor] = useState("vencimento");
+  const [ordenarDir, setOrdenarDir] = useState("asc");
+
+  const toggleOrdem = (col) => {
+    if (ordenarPor === col) setOrdenarDir(d => d === "asc" ? "desc" : "asc");
+    else { setOrdenarPor(col); setOrdenarDir("asc"); }
+  };
 
   const lista = useMemo(() => {
     return contasPagar
       .map(cp => ({ ...cp, _status: statusReal(cp) }))
       .filter(cp => filtro === "todos" || cp._status === filtro)
       .sort((a, b) => {
-        if (a._status === "vencido" && b._status !== "vencido") return -1;
-        if (b._status === "vencido" && a._status !== "vencido") return 1;
-        return a.data_vencimento.localeCompare(b.data_vencimento);
+        let va, vb;
+        if (ordenarPor === "vencimento") {
+          if (a._status === "vencido" && b._status !== "vencido") return ordenarDir === "asc" ? -1 : 1;
+          if (b._status === "vencido" && a._status !== "vencido") return ordenarDir === "asc" ? 1 : -1;
+          return ordenarDir === "asc" ? a.data_vencimento.localeCompare(b.data_vencimento) : b.data_vencimento.localeCompare(a.data_vencimento);
+        }
+        if (ordenarPor === "descricao") { va = (a.descricao || "").toLowerCase(); vb = (b.descricao || "").toLowerCase(); }
+        else if (ordenarPor === "categoria") { va = a.categoria || ""; vb = b.categoria || ""; }
+        else if (ordenarPor === "fornecedor") { va = (fornecedores.find(f => f.id === a.fornecedor_id)?.nome || "").toLowerCase(); vb = (fornecedores.find(f => f.id === b.fornecedor_id)?.nome || "").toLowerCase(); }
+        else if (ordenarPor === "valor") { va = Number(a.valor); vb = Number(b.valor); }
+        else if (ordenarPor === "status") { va = a._status; vb = b._status; }
+        if (va < vb) return ordenarDir === "asc" ? -1 : 1;
+        if (va > vb) return ordenarDir === "asc" ? 1 : -1;
+        return 0;
       });
-  }, [contasPagar, filtro]);
+  }, [contasPagar, fornecedores, filtro, ordenarPor, ordenarDir]);
 
   const totais = useMemo(() => {
     const m = contasPagar.map(cp => ({ ...cp, _status: statusReal(cp) }));
@@ -186,8 +204,19 @@ const ContasPagar = ({ contasPagar, setContasPagar, fornecedores, notify }) => {
         <table style={{ width: "100%", borderCollapse: "collapse", fontSize: ".88rem", minWidth: 580 }}>
           <thead>
             <tr style={{ background: "#111" }}>
-              {["Descrição", "Categoria", "Fornecedor", "Vencimento", "Valor", "Status", "Ações"].map(h => (
-                <th key={h} style={{ padding: ".75rem 1rem", textAlign: "left", fontSize: ".72rem", color: "#555", textTransform: "uppercase", letterSpacing: ".05em", fontWeight: 600 }}>{h}</th>
+              {[
+                { label: "Descrição", col: "descricao" },
+                { label: "Categoria", col: "categoria" },
+                { label: "Fornecedor", col: "fornecedor" },
+                { label: "Vencimento", col: "vencimento" },
+                { label: "Valor", col: "valor" },
+                { label: "Status", col: "status" },
+                { label: "Ações", col: null },
+              ].map(({ label, col }) => (
+                <th key={label} onClick={col ? () => toggleOrdem(col) : undefined}
+                  style={{ padding: ".75rem 1rem", textAlign: "left", fontSize: ".72rem", color: col ? (ordenarPor === col ? "#c9a84c" : "#555") : "#555", textTransform: "uppercase", letterSpacing: ".05em", fontWeight: 600, cursor: col ? "pointer" : "default", userSelect: "none", whiteSpace: "nowrap" }}>
+                  {label}{col && ordenarPor === col ? (ordenarDir === "asc" ? " ↑" : " ↓") : ""}
+                </th>
               ))}
             </tr>
           </thead>

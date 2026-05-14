@@ -19,6 +19,8 @@ const Estoque = ({ produtos, setProdutos, setMovimentos, notify, fornecedores, s
   const [modalEdit, setModalEdit] = useState(null);
   const [saving, setSaving] = useState(false);
   const [filtro, setFiltro] = useState("");
+  const [ordenarPor, setOrdenarPor] = useState("nome");
+  const [ordenarDir, setOrdenarDir] = useState("asc");
   const [form, setForm] = useState({ nome: "", categoria: "", unidade: "un", estoque: 0, custo: "", lucro: "", preco: "" });
   const [editForm, setEditForm] = useState({ nome: "", categoria: "", unidade: "un", custo: "", lucro: "", preco: "" });
   const [movForm, setMovForm] = useState({ tipo: "entrada", quantidade: "", obs: "", data: today() });
@@ -70,7 +72,51 @@ const Estoque = ({ produtos, setProdutos, setMovimentos, notify, fornecedores, s
     setProdutos(prev => prev.filter(p => p.id !== id)); notify("Produto excluído.");
   };
 
-  const lista = produtos.filter(p => p.nome.toLowerCase().includes(filtro.toLowerCase()));
+  const toggleOrdem = (col) => {
+    if (ordenarPor === col) setOrdenarDir(d => d === "asc" ? "desc" : "asc");
+    else { setOrdenarPor(col); setOrdenarDir("asc"); }
+  };
+
+  const lista = produtos
+    .filter(p => p.nome.toLowerCase().includes(filtro.toLowerCase()))
+    .sort((a, b) => {
+      let va, vb;
+      if (ordenarPor === "nome") { va = a.nome.toLowerCase(); vb = b.nome.toLowerCase(); }
+      else if (ordenarPor === "categoria") { va = (a.categoria || "").toLowerCase(); vb = (b.categoria || "").toLowerCase(); }
+      else if (ordenarPor === "estoque") { va = a.estoque; vb = b.estoque; }
+      else if (ordenarPor === "custo") { va = a.custo; vb = b.custo; }
+      else if (ordenarPor === "preco") { va = a.preco; vb = b.preco; }
+      if (va < vb) return ordenarDir === "asc" ? -1 : 1;
+      if (va > vb) return ordenarDir === "asc" ? 1 : -1;
+      return 0;
+    });
+
+  const exportarPDF = () => {
+    const esc = s => String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+    const fmtBRL = n => { const [int, dec] = Number(n).toFixed(2).split("."); return "R$ " + int.replace(/\B(?=(\d{3})+(?!\d))/g, ".") + "," + dec; };
+    const rows = lista.map(p => `<tr>
+      <td>${esc(p.nome)}</td>
+      <td>${esc(p.categoria || "—")}</td>
+      <td style="text-align:right">${esc(p.estoque)} ${esc(p.unidade || "un")}</td>
+      <td style="text-align:right">${fmtBRL(p.custo)}</td>
+      <td style="text-align:right;font-weight:600">${fmtBRL(p.preco)}</td>
+    </tr>`).join("");
+    const html = `<!DOCTYPE html>
+<html lang="pt-BR"><head><meta charset="UTF-8"><title>Produtos — Quasar Barber</title>
+<style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:Arial,sans-serif;font-size:12px;color:#222;padding:24px}
+h1{font-size:20px;font-weight:700;margin-bottom:4px}.sub{font-size:11px;color:#888;margin-bottom:20px}
+table{width:100%;border-collapse:collapse;margin-bottom:16px}
+th{background:#f5f5f5;padding:7px 10px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.05em;border-bottom:2px solid #ddd;color:#666}
+td{padding:6px 10px;border-bottom:1px solid #eee}@media print{body{padding:0}}</style></head>
+<body><h1>Produtos — Quasar Barber</h1>
+<div class="sub">${new Date().toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" })} · ${lista.length} produto${lista.length !== 1 ? "s" : ""}${filtro ? ` · Busca: "${esc(filtro)}"` : ""}</div>
+<table><thead><tr><th>Produto</th><th>Categoria</th><th style="text-align:right">Estoque</th><th style="text-align:right">Custo</th><th style="text-align:right">Preço Venda</th></tr></thead>
+<tbody>${rows || '<tr><td colspan="5" style="text-align:center;color:#888;padding:20px">Nenhum produto</td></tr>'}</tbody></table></body></html>`;
+    const win = window.open("", "_blank");
+    win.document.write(html);
+    win.document.close();
+    win.print();
+  };
 
   return (
     <div>
@@ -92,16 +138,27 @@ const Estoque = ({ produtos, setProdutos, setMovimentos, notify, fornecedores, s
         <div>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: isMobile ? "flex-start" : "center", marginBottom: "1.5rem", flexDirection: isMobile ? "column" : "row", gap: isMobile ? 12 : 0 }}>
             <h2 style={{ fontFamily: "'Playfair Display',serif", fontSize: "1.6rem", color: "#c9a84c", margin: 0 }}>Produtos</h2>
-            <div style={{ display: "flex", gap: 8 }}>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
               <input placeholder="Buscar produto..." value={filtro} onChange={e => setFiltro(e.target.value)} style={{ ...inp, width: isMobile ? "100%" : 200 }} />
+              <button style={btn("ghost")} onClick={exportarPDF}><Icon name="print" size={14} /> Exportar PDF</button>
               <button style={btn("primary")} onClick={() => setModalProd(true)}><Icon name="plus" size={14} /> Novo Produto</button>
             </div>
           </div>
           <div style={{ background: "#161616", border: "1px solid #2a2a2a", borderRadius: 10, overflow: "auto" }}>
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: ".88rem", minWidth: 520 }}>
               <thead><tr style={{ background: "#111" }}>
-                {["Produto", "Categoria", "Estoque", "Custo", "Preço Venda", "Ações"].map(h => (
-                  <th key={h} style={{ padding: ".75rem 1rem", textAlign: "left", fontSize: ".72rem", color: "#555", textTransform: "uppercase", letterSpacing: ".05em", fontWeight: 600 }}>{h}</th>
+                {[
+                  { label: "Produto", col: "nome" },
+                  { label: "Categoria", col: "categoria" },
+                  { label: "Estoque", col: "estoque" },
+                  { label: "Custo", col: "custo" },
+                  { label: "Preço Venda", col: "preco" },
+                  { label: "Ações", col: null },
+                ].map(({ label, col }) => (
+                  <th key={label} onClick={col ? () => toggleOrdem(col) : undefined}
+                    style={{ padding: ".75rem 1rem", textAlign: "left", fontSize: ".72rem", color: col ? (ordenarPor === col ? "#c9a84c" : "#555") : "#555", textTransform: "uppercase", letterSpacing: ".05em", fontWeight: 600, cursor: col ? "pointer" : "default", userSelect: "none", whiteSpace: "nowrap" }}>
+                    {label}{col && ordenarPor === col ? (ordenarDir === "asc" ? " ↑" : " ↓") : ""}
+                  </th>
                 ))}
               </tr></thead>
               <tbody>
