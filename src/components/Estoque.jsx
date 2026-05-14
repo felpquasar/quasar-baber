@@ -8,6 +8,7 @@ import Modal from './ui/Modal';
 import Field from './ui/Field';
 import Spinner from './ui/Spinner';
 import Compras from './Compras';
+import EmptyState from './ui/EmptyState';
 
 const TABS = [{ id: "produtos", label: "Produtos" }, { id: "compras", label: "Compras" }];
 
@@ -178,7 +179,7 @@ td{padding:6px 10px;border-bottom:1px solid #eee}@media print{body{padding:0}}</
                     </td>
                   </tr>
                 ))}
-                {lista.length === 0 && <tr><td colSpan={6} style={{ padding: "2rem", textAlign: "center", color: "#444" }}>Nenhum produto encontrado</td></tr>}
+                {lista.length === 0 && <tr><td colSpan={6} style={{ padding: 0 }}><EmptyState iconName="box" title="Nenhum produto encontrado" subtitle={filtro ? `Sem resultados para "${filtro}"` : "Cadastre o primeiro produto"} /></td></tr>}
               </tbody>
             </table>
           </div>

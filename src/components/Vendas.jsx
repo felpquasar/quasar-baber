@@ -1,4 +1,5 @@
 ﻿import { useState, useMemo } from 'react';
+import EmptyState from './ui/EmptyState';
 import { useMobile } from '../hooks/useMobile';
 import { supabase } from '../lib/supabase';
 import { fmt, today, addDays } from '../lib/utils';
@@ -401,8 +402,8 @@ const Vendas = ({ vendas, setVendas, clientes, produtos, setProdutos, setMovimen
               </tr>
             ); })}
             {lista.length === 0 && (
-              <tr><td colSpan={8} style={{ padding: "2rem", textAlign: "center", color: "#444" }}>
-                {vendas.length === 0 ? "Nenhuma venda registrada" : "Nenhuma venda corresponde ao filtro"}
+              <tr><td colSpan={8} style={{ padding: 0 }}>
+                <EmptyState iconName="cart" title={vendas.length === 0 ? "Nenhuma venda registrada" : "Nenhuma venda encontrada"} subtitle={temFiltro ? "Tente ajustar os filtros" : "Registre a primeira venda"} />
               </td></tr>
             )}
           </tbody>

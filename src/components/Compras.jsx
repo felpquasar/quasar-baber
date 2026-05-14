@@ -1,4 +1,5 @@
 ﻿import { useState, useMemo } from 'react';
+import EmptyState from './ui/EmptyState';
 import { useMobile } from '../hooks/useMobile';
 import { supabase } from '../lib/supabase';
 import { fmt, today } from '../lib/utils';
@@ -257,8 +258,8 @@ const Compras = ({ produtos, setProdutos, setMovimentos, fornecedores, setContas
               </tr>
             ))}
             {lista.length === 0 && (
-              <tr><td colSpan={7} style={{ padding: "2.5rem", textAlign: "center", color: "#444" }}>
-                Nenhum pedido {filtroStatus !== "todos" ? STATUS_LABEL[filtroStatus]?.toLowerCase() : "cadastrado"}
+              <tr><td colSpan={7} style={{ padding: 0 }}>
+                <EmptyState iconName="truck" title={`Nenhum pedido ${filtroStatus !== "todos" ? STATUS_LABEL[filtroStatus]?.toLowerCase() : "cadastrado"}`} subtitle="Registre pedidos de compra para controlar seu estoque" />
               </td></tr>
             )}
           </tbody>

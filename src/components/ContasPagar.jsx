@@ -1,4 +1,5 @@
 ﻿import { useState, useMemo } from 'react';
+import EmptyState from './ui/EmptyState';
 import { useMobile } from '../hooks/useMobile';
 import { supabase } from '../lib/supabase';
 import { fmt, today } from '../lib/utils';
@@ -273,8 +274,8 @@ const ContasPagar = ({ contasPagar, setContasPagar, fornecedores, notify }) => {
             })}
             {lista.length === 0 && (
               <tr>
-                <td colSpan={7} style={{ padding: "2rem", textAlign: "center", color: "#444" }}>
-                  {filtro === "todos" ? "Nenhuma conta a pagar registrada" : `Nenhuma conta ${STATUS_LABEL[filtro]?.toLowerCase()}`}
+                <td colSpan={7} style={{ padding: 0 }}>
+                  <EmptyState iconName="truck" title={filtro === "todos" ? "Nenhuma conta a pagar" : `Nenhuma conta ${STATUS_LABEL[filtro]?.toLowerCase()}`} subtitle="Contas de compras e despesas aparecem aqui" />
                 </td>
               </tr>
             )}

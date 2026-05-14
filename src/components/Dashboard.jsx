@@ -133,29 +133,35 @@ const Dashboard = ({ produtos, clientes, vendas, movimentos, contasReceber, cont
         </div>
       </div>
 
-      {/* Cards */}
+      {/* Hero Faturamento */}
+      <div style={{ background: "linear-gradient(135deg, #141200 0%, #0d0c00 100%)", border: "1px solid #2a2200", borderRadius: 12, padding: "1.5rem 2rem", marginBottom: "1rem", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 16 }}>
+        <div>
+          <div style={{ fontSize: ".68rem", color: "#5a4a00", textTransform: "uppercase", letterSpacing: ".1em", marginBottom: 8 }}>Faturamento {labelPeriodo}</div>
+          <div style={{ fontSize: "2.8rem", fontWeight: 700, color: "#ffbf00", lineHeight: 1, fontFamily: "'DM Mono',monospace" }}>{fmt(fat)}</div>
+          {fat > 0 && <div style={{ fontSize: ".75rem", color: lucroPeriodo >= 0 ? "#4caf82" : "#e05a5a", marginTop: 8, fontFamily: "'DM Mono',monospace" }}>{fmt(lucroPeriodo)} lucro · {((lucroPeriodo / fat) * 100).toFixed(1)}% margem</div>}
+        </div>
+        <div style={{ display: "flex", gap: "2.5rem" }}>
+          <div>
+            <div style={{ fontSize: ".68rem", color: "#5a4a00", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 6 }}>Ticket Médio</div>
+            <div style={{ fontSize: "1.5rem", fontWeight: 700, color: "#c9a84c", fontFamily: "'DM Mono',monospace" }}>{fmt(tkt)}</div>
+          </div>
+          <div>
+            <div style={{ fontSize: ".68rem", color: "#5a4a00", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 6 }}>Vendas</div>
+            <div style={{ fontSize: "1.5rem", fontWeight: 700, color: "#6b9fd4", fontFamily: "'DM Mono',monospace" }}>{vp.length}</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Cards secundários */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(180px,1fr))", gap: 12, marginBottom: "1.5rem" }}>
-        <div style={{ background: "#161616", border: "1px solid #2a2a2a", borderRadius: 10, padding: "1.25rem" }}>
-          <div style={{ fontSize: "1.6rem", fontWeight: 700, color: "#ffbf00", lineHeight: 1, fontFamily: "'DM Mono',monospace" }}>{fmt(fat)}</div>
-          <div style={{ fontSize: ".75rem", color: "#777", marginTop: 6, textTransform: "uppercase", letterSpacing: ".06em" }}>Faturamento {labelPeriodo}</div>
-        </div>
-        <div style={{ background: "#161616", border: "1px solid #2a2a2a", borderRadius: 10, padding: "1.25rem" }}>
-          <div style={{ fontSize: "1.6rem", fontWeight: 700, color: "#c9a84c", lineHeight: 1, fontFamily: "'DM Mono',monospace" }}>{fmt(tkt)}</div>
-          <div style={{ fontSize: ".75rem", color: "#777", marginTop: 6, textTransform: "uppercase", letterSpacing: ".06em" }}>Ticket Médio</div>
-        </div>
-        <div style={{ background: "#161616", border: "1px solid #2a2a2a", borderRadius: 10, padding: "1.25rem" }}>
-          <div style={{ fontSize: "1.6rem", fontWeight: 700, color: "#6b9fd4", lineHeight: 1, fontFamily: "'DM Mono',monospace" }}>{vp.length}</div>
-          <div style={{ fontSize: ".75rem", color: "#777", marginTop: 6, textTransform: "uppercase", letterSpacing: ".06em" }}>Vendas {labelPeriodo}</div>
-        </div>
         <div style={{ background: "#161616", border: `1px solid ${lucroPeriodo >= 0 ? "#1e3a2a" : "#3a1e1e"}`, borderRadius: 10, padding: "1.25rem" }}>
           <div style={{ fontSize: "1.6rem", fontWeight: 700, color: lucroPeriodo >= 0 ? "#4caf82" : "#e05a5a", lineHeight: 1, fontFamily: "'DM Mono',monospace" }}>{fmt(lucroPeriodo)}</div>
           <div style={{ fontSize: ".75rem", color: "#777", marginTop: 6, textTransform: "uppercase", letterSpacing: ".06em" }}>Lucro {labelPeriodo}</div>
-          {fat > 0 && <div style={{ fontSize: ".7rem", color: lucroPeriodo >= 0 ? "#4caf82" : "#e05a5a", marginTop: 4, fontFamily: "'DM Mono',monospace" }}>{((lucroPeriodo / fat) * 100).toFixed(1)}% de margem</div>}
         </div>
         <div style={{ background: "#161616", border: "1px solid #2a2a2a", borderRadius: 10, padding: "1.25rem" }}>
           <div style={{ fontSize: "1.6rem", fontWeight: 700, color: "#b86fcf", lineHeight: 1, fontFamily: "'DM Mono',monospace" }}>{fmt(custoEstoque)}</div>
-          <div style={{ fontSize: ".75rem", color: "#777", marginTop: 6, textTransform: "uppercase", letterSpacing: ".06em" }}>Custo Total do Estoque</div>
-          <div style={{ fontSize: ".7rem", color: "#555", marginTop: 4 }}>{produtos.length} produto(s) cadastrado(s)</div>
+          <div style={{ fontSize: ".75rem", color: "#777", marginTop: 6, textTransform: "uppercase", letterSpacing: ".06em" }}>Custo do Estoque</div>
+          <div style={{ fontSize: ".7rem", color: "#555", marginTop: 4 }}>{produtos.length} produto(s)</div>
         </div>
         <div style={{ background: "#161616", border: `1px solid ${totalVencido > 0 ? "#5a1a1a" : "#2a2a2a"}`, borderRadius: 10, padding: "1.25rem" }}>
           <div style={{ fontSize: "1.6rem", fontWeight: 700, color: totalVencido > 0 ? "#e05a5a" : "#e8a020", lineHeight: 1, fontFamily: "'DM Mono',monospace" }}>{fmt(totalAReceber)}</div>

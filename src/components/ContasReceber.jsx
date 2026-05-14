@@ -1,4 +1,5 @@
 ﻿import { useState, useMemo } from 'react';
+import EmptyState from './ui/EmptyState';
 import { useMobile } from '../hooks/useMobile';
 import { supabase } from '../lib/supabase';
 import { fmt, today } from '../lib/utils';
@@ -267,8 +268,8 @@ const ContasReceber = ({ contasReceber, setContasReceber, clientes, notify }) =>
             })}
             {lista.length === 0 && (
               <tr>
-                <td colSpan={7} style={{ padding: "2rem", textAlign: "center", color: "#444" }}>
-                  {filtro === "todos" ? "Nenhuma conta a receber registrada" : `Nenhuma conta ${STATUS_LABEL[filtro]?.toLowerCase()}`}
+                <td colSpan={7} style={{ padding: 0 }}>
+                  <EmptyState iconName="money" title={filtro === "todos" ? "Nenhuma conta a receber" : `Nenhuma conta ${STATUS_LABEL[filtro]?.toLowerCase()}`} subtitle="As contas criadas por vendas aparecem aqui" />
                 </td>
               </tr>
             )}
