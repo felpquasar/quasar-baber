@@ -128,19 +128,32 @@ const Compras = ({ produtos, setProdutos, setMovimentos, fornecedores, setContas
 
       const itens = modalReceber.pedido_itens || [];
 
-      // Calcula novos estoques acumulando por produto
+      // Calcula novos estoques e custo médio ponderado (CMP) por produto
       const estoqueMap = {};
+      const custoMap = {};
       itens.forEach(it => {
         const prod = produtos.find(p => p.id === it.produto_id);
         if (!prod) return;
-        estoqueMap[prod.id] = (estoqueMap[prod.id] ?? prod.estoque) + it.quantidade;
+        const estoqueBase = custoMap[prod.id]?.estoqueAcum ?? prod.estoque;
+        const custoBase = custoMap[prod.id]?.custo ?? prod.custo;
+        const novoEstoque = estoqueBase + it.quantidade;
+        estoqueMap[prod.id] = novoEstoque;
+        if (it.custo_unitario) {
+          const novoCusto = novoEstoque > 0
+            ? (estoqueBase * custoBase + it.quantidade * it.custo_unitario) / novoEstoque
+            : it.custo_unitario;
+          custoMap[prod.id] = { custo: novoCusto, estoqueAcum: novoEstoque };
+        }
       });
 
-      // Atualiza produtos no banco
+      // Atualiza produtos no banco (estoque + custo médio)
       await Promise.all(
-        Object.entries(estoqueMap).map(([id, novoEstoque]) =>
-          supabase.from("produtos").update({ estoque: novoEstoque }).eq("id", Number(id))
-        )
+        Object.entries(estoqueMap).map(([id, novoEstoque]) => {
+          const numId = Number(id);
+          const updates = { estoque: novoEstoque };
+          if (custoMap[numId]) updates.custo = Number(custoMap[numId].custo.toFixed(4));
+          return supabase.from("produtos").update(updates).eq("id", numId);
+        })
       );
 
       // Insere movimentos de entrada
@@ -158,7 +171,10 @@ const Compras = ({ produtos, setProdutos, setMovimentos, fornecedores, setContas
       const novosMovs = movInserts.map(r => r.data).filter(Boolean);
 
       // Atualiza estado local de produtos e movimentos
-      setProdutos(prev => prev.map(p => estoqueMap[p.id] !== undefined ? { ...p, estoque: estoqueMap[p.id] } : p));
+      setProdutos(prev => prev.map(p => {
+        if (estoqueMap[p.id] === undefined) return p;
+        return { ...p, estoque: estoqueMap[p.id], custo: custoMap[p.id]?.custo ?? p.custo };
+      }));
       if (novosMovs.length > 0) setMovimentos(prev => [...novosMovs, ...prev]);
 
       // Cria conta a pagar se solicitado
@@ -182,7 +198,7 @@ const Compras = ({ produtos, setProdutos, setMovimentos, fornecedores, setContas
         : p
       ));
       setModalReceber(null);
-      notify("Pedido recebido! Estoque atualizado.");
+      notify("Pedido recebido! Estoque e custo médio atualizados.");
     } finally { setSaving(false); }
   };
 
